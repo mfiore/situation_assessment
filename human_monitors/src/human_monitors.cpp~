@@ -1,0 +1,215 @@
+#include "opaque-pub.h"
+#include "mp-pub.h"
+#include "ros/ros.h"
+#include <iostream>
+#include "std_msgs/String.h"
+#include "boost/thread.hpp"
+#include <utility>
+#include <tuple>
+#include<geometry_msgs/Point.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <spencer_tracking_msgs/TrackedPersons.h>
+#include <spencer_tracking_msgs/TrackedPerson.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_datatypes.h>
+
+
+using namespace std;
+string oprsSup = "OPRS_SUP";
+string destDb="OPRS_DB";
+
+double threshold=0.2;
+
+int mpSocketRequests, mpSocketCommands;
+ros::Publisher monitorPub;
+
+geometry_msgs::PoseStamped lastPose;
+
+string hostName;
+string agentHand;
+
+ros::Subscriber sub;
+
+map<string,geometry_msgs::Point> monitors;
+
+string getNext(char *message, int *i) {
+	string ret;
+    while (message[*i]!=' ' && message[*i]!=')'){
+    	ret=ret+message[*i];
+    	(*i)++;
+    }
+    (*i)++;
+    return ret;
+}
+
+
+geometry_msgs::Point getPosition(string object, string *returnReport) {
+	geometry_msgs::Point position;
+
+	string strMessage="(HumanMonitors.rosRequest getPose "+object+")";
+	char message[50];
+	strcpy(message,strMessage.c_str());
+	send_message_string(message,oprsSup.c_str());
+
+	int length;
+	char* sender=read_string_from_socket(mpSocketRequests,&length);
+	char* charReport=read_string_from_socket(mpSocketRequests,&length);
+
+	int i=0;
+	getNext(charReport,&i);
+	string report=getNext(charReport,&i);
+	cout<<"get position report "<<report<<"\n";
+	if (report=="\"OK\"") {
+		sender=read_string_from_socket(mpSocketRequests,&length);
+		char *charResult=read_string_from_socket(mpSocketRequests,&length);
+		cout<<charResult<<"\n";
+		i=0;
+		getNext(charResult,&i);
+		string x=getNext(charResult,&i);
+		string y=getNext(charResult,&i);
+		string z=getNext(charResult,&i);
+
+		cout<<"\n"<<x<<" "<<y<<" "<<z<<"\n";
+		position.x=stod(x);
+		position.y=stod(y);
+		position.z=stod(z);
+
+		*returnReport="OK";
+	}
+	else {
+		*returnReport="FAILURE";
+	}
+	return position;
+}
+
+bool addMonitor(string object) {
+	string report;
+	geometry_msgs::Point position=getPosition(object, &report);
+	cout<<object<<" "<<report<<"\n";
+	if (report=="OK") {
+		monitors[object]=position;
+		return true;
+	}
+	else return false;
+
+}
+
+void removeMonitor(string object) {
+	monitors.erase(object);
+}
+
+void removeAllMonitors(){
+	monitors.clear();
+}
+
+void getAgentPose() {
+tf::StampedTransform transform;
+		ros::Time now = ros::Time(0);
+		tf::TransformListener listener;
+
+		try {//
+//			//transform from the mocap frame to map
+			listener.waitForTransform("/map", agentHand,
+					now, ros::Duration(3.0));
+			listener.lookupTransform("/map", agentHand,
+					now, transform);
+				lastPose.pose.position.x=transform.getOrigin().getX();
+				lastPose.pose.position.y=transform.getOrigin().getY();
+				lastPose.pose.position.z=transform.getOrigin().getZ();
+
+		} catch (tf::TransformException ex) {
+			ROS_ERROR("%s", ex.what());
+
+
+	}
+}
+
+//
+void oprsLoop() {
+    //read the openprs message
+    int length;
+    char *sender = read_string_from_socket(mpSocketCommands, &length);
+    char *message = read_string_from_socket(mpSocketCommands, &length);
+    ROS_INFO("%s\n", message);
+
+    int i=0;
+    getNext(message,&i);
+    string operation=getNext(message,&i);
+    if (operation=="addMonitor") {
+    	string object=getNext(message,&i);
+    	addMonitor(object);
+    }
+    else if (operation=="removeMonitor") {
+    	string object=getNext(message,&i);
+    	removeMonitor(object);
+    }
+    else if (operation=="removeAll") {
+    	removeAllMonitors();
+    }
+}
+
+
+
+
+
+
+double dist3d(string object) {
+	geometry_msgs::Point objectPoint=monitors[object];
+	geometry_msgs::Point agentPoint=lastPose.pose.position;
+	//cout<<agentPoint.x<<" "<<agentPoint.y<<" "<<objectPoint.x<<" "<<objectPoint.y<<"\n";
+	double dist=sqrt(pow(objectPoint.x - agentPoint.x,2)+pow(objectPoint.y-agentPoint.y,2)+pow(objectPoint.z-agentPoint.z,2));
+	return dist;
+}
+
+
+void trigger(string monitor) {
+	string strMessage="(HumanMonitors.rosRequest trigger "+monitor+")";
+	char message[50];
+	strcpy(message,strMessage.c_str());
+	send_message_string(message,oprsSup.c_str());
+
+}
+int main(int argc, char **argv) {
+	if (argc<3) {
+		cout<<"usage hostName agentHand\n";
+		return 0;
+	}
+	hostName=argv[1];
+	agentHand=argv[2];
+	ros::init(argc,argv,"human_monitors");
+	ros::NodeHandle n;
+
+	mpSocketRequests = external_register_to_the_mp_host_prot("human_monitors_requests", hostName.c_str(),3300, STRINGS_PT);
+	mpSocketCommands = external_register_to_the_mp_host_prot("human_monitors_commands", hostName.c_str(),3300, STRINGS_PT);
+
+
+	if (mpSocketRequests!=-1) {
+
+		addMonitor("BRACKET_1");
+		addMonitor("GLUE_BOTTLE");
+		addMonitor("STOCK_TABLE");
+
+		ros::Rate r(5);
+		while(ros::ok()) {
+			getAgentPose();
+			double distMin=10;
+			string minMonitor;
+			bool isActive=false;
+			for (auto monitor:monitors) {
+				double dist=dist3d(monitor.first);
+
+				if (dist<threshold && dist<distMin) {
+					isActive=true;
+					minMonitor=monitor.first;
+					distMin=dist;
+				}
+				cout<<monitor.first<<" "<<dist<<"\n";
+			}
+			if (isActive) {
+				trigger(minMonitor);
+			}
+			r.sleep();
+		}
+	}
+}
+

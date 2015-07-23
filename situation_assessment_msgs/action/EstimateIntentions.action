@@ -1,0 +1,14 @@
+string[] actions
+string[] contexts
+string[] objects
+string[] intentions
+---
+string intention
+string action
+float32 intentionProbability
+float32 actionProbability
+---
+string intention
+string action
+float32 intentionProbability
+float32 actionProbability
