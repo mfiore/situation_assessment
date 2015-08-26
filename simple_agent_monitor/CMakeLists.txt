@@ -3,11 +3,11 @@ include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
-    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+		message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
 
@@ -18,12 +18,13 @@ project(simple_agent_monitor)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_runtime
-  roscpp
-  rospy
-  tf
-  geometry_msgs
-  situation_assessment_msgs
+	message_runtime
+	roscpp
+	rospy
+	tf
+	geometry_msgs
+	situation_assessment_msgs
+	spencer_tracking_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -99,9 +100,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+	INCLUDE_DIRS include
 #  LIBRARIES simple_agent_monitor
-  CATKIN_DEPENDS  message_runtime roscpp rospy tf geometry_msgs situation_assessment_msgs
+	CATKIN_DEPENDS  message_runtime roscpp rospy tf geometry_msgs situation_assessment_msgs 	spencer_tracking_msgs
+
 #  DEPENDS system_lib
 )
 
@@ -111,9 +113,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+	include
+	${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -130,7 +132,7 @@ include_directories(
 
 # Specify libraries to link a library or executable target against
  target_link_libraries(simple_agent_monitor
-   ${catkin_LIBRARIES}
+	 ${catkin_LIBRARIES}
  )
 
 #############

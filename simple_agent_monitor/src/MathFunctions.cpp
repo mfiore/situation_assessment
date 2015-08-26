@@ -1,13 +1,15 @@
 /*
  * MathFunctions.cpp
  *
- *  Created on: Jun 3, 2015
+ *  *  Created on: Jun 3, 2015
  *      Author: mfiore
+ *  
+ *  
  */
 
 
 
-#include "MathFunctions.h"
+#include "simple_agent_monitor/MathFunctions.h"
 
 
 double calculateDistance(geometry_msgs::Point p1, geometry_msgs::Point p2) {
@@ -22,7 +24,7 @@ bool isMoving(vector<geometry_msgs::Point> vp) {
 	 for (int i=0; i<vp.size()-1;i++){
 		 sum=sum+calculateDistance(vp[i],vp[i+1]);
 	 }
-     cout<<"Is moving sum "<<sum<<"\n";
+     // cout<<"Is moving sum "<<sum<<"\n";
 	 return sum>0.3;
 }
 

@@ -5,7 +5,7 @@
  *      Author: mfiore
  */
 
-#include "RingBuffer.h"
+#include "simple_agent_monitor/RingBuffer.h"
 
 RingBuffer::RingBuffer() {
 	// TODO Auto-generated constructor stub
