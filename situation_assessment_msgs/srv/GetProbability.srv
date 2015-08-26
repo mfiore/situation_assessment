@@ -1,9 +1,0 @@
-string[] evidenceName
-string[] evidenceValue
-
----
-string[] intentionName
-float64[] intentionProbability
-string[] actionName
-float64[] actionProbability
-

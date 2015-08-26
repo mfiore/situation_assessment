@@ -1,6 +1,0 @@
-string[] intentions
-string[] actions
-Fact[] state
----
-
-ActionValueList[] actionValues

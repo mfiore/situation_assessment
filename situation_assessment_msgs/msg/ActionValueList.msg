@@ -1,2 +1,0 @@
-string action
-ActionValue[] actionValues

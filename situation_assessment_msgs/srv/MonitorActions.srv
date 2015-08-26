@@ -1,5 +1,0 @@
-string[] intentions
-string[] actions
-string[] objects
----
-bool result
