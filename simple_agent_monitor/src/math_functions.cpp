@@ -9,7 +9,7 @@
 
 
 
-#include "simple_agent_monitor/MathFunctions.h"
+#include "simple_agent_monitor/math_functions.h"
 
 
 double calculateDistance(geometry_msgs::Point p1, geometry_msgs::Point p2) {

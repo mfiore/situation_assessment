@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>situation_assessment_msgs</name>
+  <name>spencer_human_estimation</name>
   <version>0.0.0</version>
-  <description>The situation_assessment_msgs package</description>
+  <description>The spencer_human_estimation package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/situation_assessment_msgs</url> -->
+  <!-- <url type="website">http://wiki.ros.org/spencer_human_estimation</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -43,18 +43,10 @@
 
   <build_depend> roscpp </build_depend>
   <build_depend> rospy </build_depend>
-  <build_depend> std_msgs </build_depend>
-  <build_depend> message_generation </build_depend>
-  <build_depend> message_runtime </build_depend>
-  <build_depend> geometry_msgs </build_depend>
-  
+  <build_depend> situation_assessment_msgs </build_depend>
   <run_depend> roscpp </run_depend>
   <run_depend> rospy </run_depend>
-  <run_depend> std_msgs </run_depend>
-  <run_depend> message_generation </run_depend>
-  <run_depend> message_runtime </run_depend>
-  <run_depend> geometry_msgs </run_depend>
-
+  <run_depend> situation_assessment_msgs </run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

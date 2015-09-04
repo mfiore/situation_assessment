@@ -1,0 +1,10 @@
+<library path="lib/libvisualize_situation">
+  <class name="visualize_situation/VisualizeAreas"
+         type="visualize_areas::AreaDisplay"
+         base_class_type="rviz::Display">
+    <description>
+      Visualize situation assessment areas.
+    </description>
+    <message_type>situation_assessment_msgs/AreaList.h</message_type>
+  </class>
+</library>

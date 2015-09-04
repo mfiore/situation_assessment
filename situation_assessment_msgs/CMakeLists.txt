@@ -4,7 +4,7 @@ project(situation_assessment_msgs)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp message_generation std_msgs message_runtime geometry_msgs)
+find_package(catkin REQUIRED roscpp rospy message_generation std_msgs message_runtime geometry_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system )
@@ -44,15 +44,23 @@ find_package(catkin REQUIRED roscpp message_generation std_msgs message_runtime 
    FILES
    Fact.msg
    FactList.msg
-   AgentPose.msg
-   AgentPoseList.msg
-
+   NamedPose.msg
+   NamedPoseList.msg
+   Group.msg
+   GroupList.msg
+   HumanIntention.msg
+   HumanIntentionList.msg
+   AreaList.msg
  )
+
 
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
    AddArea.srv
+   NameRequest.srv
+   QueryDatabase.srv
+   DatabaseRequest.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -83,7 +91,7 @@ find_package(catkin REQUIRED roscpp message_generation std_msgs message_runtime 
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES situation_assessment_msgs
-  CATKIN_DEPENDS std_msgs message_generation message_runtime geometry_msgs 
+  CATKIN_DEPENDS roscpp rospy std_msgs message_generation message_runtime geometry_msgs 
 #  DEPENDS system_lib
 )
 

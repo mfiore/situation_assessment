@@ -1,30 +1,16 @@
-## check c++11 / c++0x
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-		message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
-
 cmake_minimum_required(VERSION 2.8.3)
-project(simple_agent_monitor)
+project(tf_bridge)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-	message_runtime
-	roscpp
-	rospy
-	tf
-	geometry_msgs
-	situation_assessment_msgs
-	spencer_tracking_msgs
+  roscpp
+  rospy
+  situation_assessment_msgs
+  message_runtime
+  tf
+  data_lib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -61,12 +47,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-#  add_message_files(
-#    FILES
-#    AgentPoseList.msg
-#    AgentPose.msg
-#    Fact.msg
-#    FactList.msg
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -84,10 +68,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-#  generate_messages(
-#    DEPENDENCIES
-#    std_msgs  # Or other packages containing msgs
-#    geometry_msgs
+# generate_messages(
+#   DEPENDENCIES
+#   situation_assessment_msgs
 # )
 
 ###################################
@@ -100,10 +83,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-	INCLUDE_DIRS include
-#  LIBRARIES simple_agent_monitor
-	CATKIN_DEPENDS  message_runtime roscpp rospy tf geometry_msgs situation_assessment_msgs 	spencer_tracking_msgs
-
+  INCLUDE_DIRS include
+#  LIBRARIES tf_bridge
+  CATKIN_DEPENDS roscpp rospy situation_assessment_msgs tf message_runtime data_lib
 #  DEPENDS system_lib
 )
 
@@ -113,26 +95,27 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+# include_directories(include)
 include_directories(
-	include
-	${catkin_INCLUDE_DIRS}
+ include
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-# add_library(simple_agent_monitor
-#   src/${PROJECT_NAME}/simple_agent_monitor.cpp
+# add_library(tf_bridge
+#   src/${PROJECT_NAME}/tf_bridge.cpp
 # )
 
 ## Declare a cpp executable
- add_executable(simple_agent_monitor src/simple_agent_monitor.cpp src/math_functions.cpp src/agent_monitors.cpp src/data_reader.cpp )
+add_executable(tf_bridge src/main.cpp src/tf_bridge.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
- add_dependencies(simple_agent_monitor situation_assessment_msgs_generate_messages_cpp)
+add_dependencies(tf_bridge situation_assessment_msgs_generate_messages_cpp)
 
-# Specify libraries to link a library or executable target against
- target_link_libraries(simple_agent_monitor
-	 ${catkin_LIBRARIES}
+## Specify libraries to link a library or executable target against
+ target_link_libraries(tf_bridge
+   ${catkin_LIBRARIES}
  )
 
 #############
@@ -150,7 +133,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS simple_agent_monitor simple_agent_monitor_node
+# install(TARGETS tf_bridge tf_bridge_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -175,7 +158,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_simple_agent_monitor.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_tf_bridge.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
