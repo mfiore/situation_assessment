@@ -17,6 +17,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::calculateIsFacing(EntityM
 
 				bool value=isFacing(pose1,pose2.position);
 				situation_assessment_msgs::Fact f;
+				f.model=robot_name_;
 				f.subject=entity1->first;
 				f.predicate.push_back("isFacing");
 				f.predicate.push_back(entity2->first);
@@ -33,6 +34,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getGroupContains(StringVe
 	for (StringVectorMap::iterator group_members=map.begin();group_members!=map.end();group_members++) {
 		BOOST_FOREACH(string agent,group_members->second) {
 			situation_assessment_msgs::Fact f;
+			f.model=robot_name_;
 			f.subject=group_members->first;
 			f.predicate.push_back("contains");
 			f.value=agent;
@@ -59,6 +61,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDistances(EntityMap ma
 				}
 				(*entity_distances)[distanceInput].insert(d);
 				situation_assessment_msgs::Fact f;
+				f.model=robot_name_;
 				f.subject=entity1->first;
 				f.predicate.push_back("distance");
 				f.predicate.push_back(entity2->first);
@@ -83,6 +86,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getIsMoving(EntityMap map
 		bool value=isMoving(points);
 
 		situation_assessment_msgs::Fact f;
+		f.model=robot_name_;
 		f.subject=entity->first;
 		f.predicate.push_back("isMoving");
 		f.value=to_string(value);
@@ -108,6 +112,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDeltaDistances(EntityM
 
 					double delta_distance=distances[9]-distances[0];
 					situation_assessment_msgs::Fact f;
+					f.model=robot_name_;
 					f.subject=entity1->first;
 					f.predicate.push_back("delta_distance");
 					f.predicate.push_back(entity2->first);
@@ -147,6 +152,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityType(EntityMap m
 	vector<situation_assessment_msgs::Fact> result;
 	for (EntityMap::iterator entity=map.begin(); entity!= map.end(); entity++) {
 		situation_assessment_msgs::Fact new_fact;
+		new_fact.model=robot_name_;
 		new_fact.subject=entity->second.name;
 		new_fact.predicate.push_back("type");
 		new_fact.value=entity->second.type;

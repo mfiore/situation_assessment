@@ -13,7 +13,7 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	groups_sub_=node_handle_.subscribe("situation_assessment/group_poses",1000,
 		&DataReader::groupsCallback,this);
 
-	ROS_INFO("Waiting for appropriate topics to be publishes");
+	ROS_INFO("Waiting for appropriate topics to be published");
 	
 	ros::Rate r(3);
 	while ((robot_sub_.getNumPublishers()==0   

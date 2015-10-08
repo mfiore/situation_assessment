@@ -109,7 +109,7 @@ void updateDatabase(ros::ServiceClient* add_database_client,ros::ServiceClient* 
 			to_add.push_back(factList[i]);
 		}
 		else {
-			ROS_INFO("Found a fact");
+			// ROS_INFO("Found a fact");
 			old_fact_found[pos]=true;
 		}
 	}
@@ -121,6 +121,8 @@ void updateDatabase(ros::ServiceClient* add_database_client,ros::ServiceClient* 
 	situation_assessment_msgs::DatabaseRequest req_add,req_remove;
 	req_add.request.fact_list=to_add;
 	req_remove.request.fact_list=to_remove;
+	ROS_INFO("To add size %d",to_add.size());
+	ROS_INFO("To remove size %d",to_remove.size());
 	if (!add_database_client->call(req_add)) {
 		ROS_WARN("Can't add facts to database");
 	}
@@ -159,7 +161,7 @@ int main(int argc, char** argv) {
 
 	ROS_INFO("Advertising topics and services");
 
-	ros::Rate rate(10.0);
+	ros::Rate rate(3);
 	ROS_INFO("Starting computation");
 
 	PairMap entity_distances;
@@ -167,8 +169,10 @@ int main(int argc, char** argv) {
 	vector<situation_assessment_msgs::Fact> old_fact_list;
 
 	while (ros::ok()) {
+		// ROS_INFO("Before spin");
 		ros::spinOnce();
 
+		// ROS_INFO("Start of the cycle");
 
 		EntityMap agent_poses=data_reader.getAgentPoses();
 		Entity robot_poses=data_reader.getRobotPoses();
@@ -227,6 +231,7 @@ int main(int argc, char** argv) {
 
 			old_fact_list=factList.fact_list;
 	 	}
+	 	// ROS_INFO("End of the cycle");
 		rate.sleep();
 	}
 	ros::shutdown();
