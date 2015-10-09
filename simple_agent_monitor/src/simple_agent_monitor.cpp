@@ -47,27 +47,34 @@ double angleThreshold;
 PairMap agentDistances;
 PolygonMap areas; 
 GeometryPolygonMap msg_areas_map;
+GeometryPolygonMap entity_areas;
 
 
 //service to add a geometrical area in the environment
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
-	geometry_msgs::Polygon area=req.area;
 
-	ROS_INFO("Adding a new area to monitor. Coordinates:");	
-	Point pts[area.points.size()];
-	int i=0;
-	for (geometry_msgs::Point32 point:area.points) {
-		pts[i]=gtl::construct<Point>(point.x,point.y);
-		ROS_INFO("- %f %f",point.x,point.y);
-		i++;
+	if (req.linked_to_entity!="") {
+		entity_areas[req.linked_to_entity]=req.area;
+		ROS_INFO("Adding a new area to entity %s",req.linked_to_entity.c_str());
 	}
-	Polygon poly;
-	gtl::set_points(poly, pts, pts+i);
+	else {
+		geometry_msgs::Polygon area=req.area;
 
-	areas[req.name]=poly;
-	msg_areas_map[req.name]=req.area;
+		ROS_INFO("Adding a new area to monitor. Coordinates:");	
+		Point pts[area.points.size()];
+		int i=0;
+		for (geometry_msgs::Point32 point:area.points) {
+			pts[i]=gtl::construct<Point>(point.x,point.y);
+			ROS_INFO("- %f %f",point.x,point.y);
+			i++;
+		}
+		Polygon poly;
+		gtl::set_points(poly, pts, pts+i);
 
+		areas[req.name]=poly;
+		msg_areas_map[req.name]=req.area;
+	}
 
 	res.result=true;
 	return true;
@@ -121,14 +128,74 @@ void updateDatabase(ros::ServiceClient* add_database_client,ros::ServiceClient* 
 	situation_assessment_msgs::DatabaseRequest req_add,req_remove;
 	req_add.request.fact_list=to_add;
 	req_remove.request.fact_list=to_remove;
-	ROS_INFO("To add size %d",to_add.size());
-	ROS_INFO("To remove size %d",to_remove.size());
 	if (!add_database_client->call(req_add)) {
 		ROS_WARN("Can't add facts to database");
 	}
 	if (!remove_database_client->call(req_remove)) {
 		ROS_WARN("Cant remove facts from database");
 	} 
+}
+
+geometry_msgs::Point32 rotatePoint(geometry_msgs::Point32 p, geometry_msgs::Point32 pivot, double theta) {
+
+	p.x=p.x-pivot.x;
+	p.y=p.y-pivot.y;
+
+	geometry_msgs::Point32 rotated_p;
+
+	rotated_p.x=p.x*cos(theta)-p.y*sin(theta);
+	rotated_p.y=p.x*sin(theta)+p.y*cos(theta);
+
+	rotated_p.x=rotated_p.x+pivot.x;
+	rotated_p.y=rotated_p.y+pivot.y;
+
+	return rotated_p;
+}
+
+
+void updateEntityAreas(EntityMap agent_poses) {
+	for(GeometryPolygonMap::iterator it=entity_areas.begin();it!=entity_areas.end();it++) {
+		string entity_name=it->first;
+		geometry_msgs::Polygon area=it->second;
+
+
+		if (agent_poses.find(entity_name)!=agent_poses.end()) {
+			Entity this_entity=agent_poses[entity_name];
+			
+			geometry_msgs::Pose this_entity_pose=this_entity.pose.getSequence(1)[0];
+			geometry_msgs::Point32 entity_center;
+			entity_center.x=this_entity_pose.position.x; 
+			entity_center.y=this_entity_pose.position.y;
+			// double entity_orientation=tf::getYaw(this_entity_pose.orientation); 
+			double entity_orientation=1.6;
+			for (int i=0; i<area.points.size();i++) {
+				area.points[i].x+=this_entity_pose.position.x;
+				area.points[i].y+=this_entity_pose.position.y;
+
+				area.points[i]=rotatePoint(area.points[i],entity_center,entity_orientation);
+			}
+
+
+			Point pts[area.points.size()];
+			int i=0;
+			for (geometry_msgs::Point32 point:area.points) {
+				pts[i]=gtl::construct<Point>(point.x,point.y);
+				i++;
+			}
+			Polygon poly;
+			gtl::set_points(poly, pts, pts+i);
+
+			areas[entity_name]=poly;
+			msg_areas_map[entity_name]=area;
+		}
+		else {
+			if (areas.find(entity_name)!=areas.end()) {
+				areas.erase(entity_name);
+				msg_areas_map.erase(entity_name);
+			}
+		}
+	}
+
 }
 
 int main(int argc, char** argv) {
@@ -175,10 +242,13 @@ int main(int argc, char** argv) {
 		// ROS_INFO("Start of the cycle");
 
 		EntityMap agent_poses=data_reader.getAgentPoses();
+
 		Entity robot_poses=data_reader.getRobotPoses();
 		EntityMap object_poses=data_reader.getObjectPoses();
 		EntityMap group_poses=data_reader.getGroupPoses();
 		StringVectorMap group_members=data_reader.getAgentGroups();
+
+
 
 		if (agent_poses.size()>0) {
 			EntityMap all_agents=agent_poses;
@@ -187,6 +257,8 @@ int main(int argc, char** argv) {
 			if (object_poses.size()>0) {
 				all_entities.insert(object_poses.begin(),object_poses.end());
 			}
+			updateEntityAreas(all_agents);
+
 
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
