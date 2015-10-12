@@ -1,7 +1,6 @@
 #include <simple_agent_monitor/agent_monitors.h>
 
 AgentMonitors::AgentMonitors(string robot_name):robot_name_(robot_name) {
-	// n.getParam("/situation_assessment/orientation_angle_threshold",angleThreshold);
 
 }
 

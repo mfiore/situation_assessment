@@ -18,4 +18,5 @@ situation_assessment:
         track_groups: false
     human_names:
         - HERAKLES_HUMAN1 
+        - HERAKLES_HUMAN2
         #object_names: 

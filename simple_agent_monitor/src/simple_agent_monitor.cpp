@@ -1,3 +1,11 @@
+/**
+    simple_agent_onitor.h
+    author: Michelangelo Fiore
+
+	class to apply geometrical reasoning on entities in the system, creating facts containing the distance between agents,
+	delta distances, facing and so on.
+*/
+
 //ros stuff
 #include <ros/ros.h>
 
@@ -33,6 +41,7 @@
 using namespace std;
 namespace gtl = boost::polygon;
 
+//useful typedef
 typedef map<string,RingBuffer<geometry_msgs::Pose>> BufferMap;
 typedef map<string,bool> BoolMap;
 typedef map<string,vector<string> > StringVectorMap;
@@ -44,17 +53,17 @@ typedef map<string,geometry_msgs::Polygon> GeometryPolygonMap;
 string robotName;
 double angleThreshold;
 
-PairMap agentDistances;
-PolygonMap areas; 
-GeometryPolygonMap msg_areas_map;
-GeometryPolygonMap entity_areas;
+PairMap agentDistances;  //distances between agents
+PolygonMap areas; 		  //areas represented as polygons
+GeometryPolygonMap msg_areas_map;   //areas as geometry msgs, used for publishing
+GeometryPolygonMap entity_areas;	//areas linked to entities
 
 
 //service to add a geometrical area in the environment
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
 
-	if (req.linked_to_entity!="") {
+	if (req.linked_to_entity!="") { //if linked will update the area with the entity position
 		entity_areas[req.linked_to_entity]=req.area;
 		ROS_INFO("Adding a new area to entity %s",req.linked_to_entity.c_str());
 	}
@@ -80,6 +89,7 @@ bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessm
 	return true;
 }
 
+//removes an area
 bool removeArea(situation_assessment_msgs::NameRequest::Request &req, situation_assessment_msgs::NameRequest::Response &res) {
 	areas.erase(req.name);
 
@@ -88,7 +98,7 @@ bool removeArea(situation_assessment_msgs::NameRequest::Request &req, situation_
 	return true;
 }
 
-
+//compare facts to check if they are the same or different
 bool compareFacts(situation_assessment_msgs::Fact f1, situation_assessment_msgs::Fact f2) {
 	if (f1.predicate.size()!=f2.predicate.size()) return false;
 	for (int i=0; i<f1.predicate.size();i++) {
@@ -96,6 +106,7 @@ bool compareFacts(situation_assessment_msgs::Fact f1, situation_assessment_msgs:
 	}
 	return f1.subject==f2.subject && f1.model==f2.model && f1.value==f2.value;
 }
+//finds a fact in the list
 int findFact(situation_assessment_msgs::Fact f, vector<situation_assessment_msgs::Fact> list) {
 	for (int i=0; i<list.size();i++) {
 		if (compareFacts(list[i],f)) return i;
@@ -103,23 +114,28 @@ int findFact(situation_assessment_msgs::Fact f, vector<situation_assessment_msgs
 	return -1;
 }
 
+//updates the database with new facts, removing obsolete facts
 void updateDatabase(ros::ServiceClient* add_database_client,ros::ServiceClient* remove_database_client,
 	vector<situation_assessment_msgs::Fact> factList, vector<situation_assessment_msgs::Fact> old_fact_list) {
 	map<int,bool> old_fact_found;
 	vector<situation_assessment_msgs::Fact> to_add,to_remove;
+
+	//start setting old facts as obsolete. When we found them (e.g. they are not obsolete) we update the value to true in this map
 	for (int i=0; i<old_fact_list.size();i++) {
 		old_fact_found[i]=false;
 	}
+
+	//if we find a fact in the new fact list which wasn't in the old, we add it to the list of facts to add to the database
 	for (int i=0; i<factList.size();i++) {
 		int pos=findFact(factList[i],old_fact_list);
 		if (pos==-1) {
 			to_add.push_back(factList[i]);
 		}
 		else {
-			// ROS_INFO("Found a fact");
 			old_fact_found[pos]=true;
 		}
 	}
+	//every fact of the old list that's not in the new will be added to the list of facts to remove from the atabase.
 	for (int i=0;i<old_fact_list.size();i++) {
 		if (old_fact_found[i]==false) {
 			to_remove.push_back(old_fact_list[i]);
@@ -136,6 +152,7 @@ void updateDatabase(ros::ServiceClient* add_database_client,ros::ServiceClient* 
 	} 
 }
 
+//rotates a point by angle theta around the pivot point
 geometry_msgs::Point32 rotatePoint(geometry_msgs::Point32 p, geometry_msgs::Point32 pivot, double theta) {
 
 	p.x=p.x-pivot.x;
@@ -153,6 +170,7 @@ geometry_msgs::Point32 rotatePoint(geometry_msgs::Point32 p, geometry_msgs::Poin
 }
 
 
+//updates areas linked to entities with their new positions
 void updateEntityAreas(EntityMap agent_poses) {
 	for(GeometryPolygonMap::iterator it=entity_areas.begin();it!=entity_areas.end();it++) {
 		string entity_name=it->first;
@@ -166,8 +184,7 @@ void updateEntityAreas(EntityMap agent_poses) {
 			geometry_msgs::Point32 entity_center;
 			entity_center.x=this_entity_pose.position.x; 
 			entity_center.y=this_entity_pose.position.y;
-			// double entity_orientation=tf::getYaw(this_entity_pose.orientation); 
-			double entity_orientation=1.6;
+			double entity_orientation=tf::getYaw(this_entity_pose.orientation); 
 			for (int i=0; i<area.points.size();i++) {
 				area.points[i].x+=this_entity_pose.position.x;
 				area.points[i].y+=this_entity_pose.position.y;
@@ -208,9 +225,9 @@ int main(int argc, char** argv) {
 	ROS_INFO("Init simple_agent_monitor");
 	ROS_INFO("Robot name is %s",robotName.c_str());
 
-	DataReader data_reader(node_handle);
+	DataReader data_reader(node_handle); //reads entities data
 
-	AgentMonitors agent_monitors(robotName);
+	AgentMonitors agent_monitors(robotName); //monitors on entities data
 
 	ros::Publisher factPublisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/agent_fact_list",1000);
 	ros::Publisher areaPublisher=node_handle.advertise<situation_assessment_msgs::AreaList>("situation_assessment/area_polygons",1000);
@@ -236,30 +253,26 @@ int main(int argc, char** argv) {
 	vector<situation_assessment_msgs::Fact> old_fact_list;
 
 	while (ros::ok()) {
-		// ROS_INFO("Before spin");
 		ros::spinOnce();
 
-		// ROS_INFO("Start of the cycle");
-
+		//gets entities data
 		EntityMap agent_poses=data_reader.getAgentPoses();
-
 		Entity robot_poses=data_reader.getRobotPoses();
 		EntityMap object_poses=data_reader.getObjectPoses();
 		EntityMap group_poses=data_reader.getGroupPoses();
 		StringVectorMap group_members=data_reader.getAgentGroups();
 
-
-
 		if (agent_poses.size()>0) {
+			//create some containers with only humans, human and robot, or human robot and objects.
 			EntityMap all_agents=agent_poses;
 			all_agents[robotName]=robot_poses;
 			EntityMap all_entities=all_agents;
 			if (object_poses.size()>0) {
 				all_entities.insert(object_poses.begin(),object_poses.end());
 			}
-			updateEntityAreas(all_agents);
+			updateEntityAreas(all_agents); //update areas linked to entities
 
-
+			//get facts
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
@@ -288,6 +301,7 @@ int main(int argc, char** argv) {
 
 			factPublisher.publish(factList);
 
+			//publish area list for visualization
 			situation_assessment_msgs::AreaList msg_area;
 			msg_area.header.stamp=ros::Time::now();
 			msg_area.header.frame_id="map";
@@ -299,11 +313,11 @@ int main(int argc, char** argv) {
 			msg_area.areas=polygon_list;
 			areaPublisher.publish(msg_area);
 
+			//update the db
 			updateDatabase(&add_database_client,&remove_database_client,factList.fact_list,old_fact_list);
 
 			old_fact_list=factList.fact_list;
 	 	}
-	 	// ROS_INFO("End of the cycle");
 		rate.sleep();
 	}
 	ros::shutdown();

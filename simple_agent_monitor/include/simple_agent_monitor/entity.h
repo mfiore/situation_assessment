@@ -1,3 +1,11 @@
+/**
+    entity.h
+    author: Michelangelo Fiore
+
+	represents an entity, with a name, a pose, and a type.
+
+*/
+
 #ifndef ENTITY_H
 #define ENTITY_H
 

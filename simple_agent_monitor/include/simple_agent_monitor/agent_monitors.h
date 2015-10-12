@@ -1,3 +1,11 @@
+/**
+    agent_monitors.h
+    author: Michelangelo Fiore
+
+    encapsulate procedures to calculate geometrical information from perception data of agents.
+
+*/
+
 #ifndef AGENT_MONITORS_H
 #define AGENT_MONITORS_H
 
@@ -33,20 +41,19 @@ class AgentMonitors {
 public:
 	AgentMonitors(string robot_name);
 
-    vector<situation_assessment_msgs::Fact> calculateIsFacing(EntityMap map1, EntityMap map2);
-    vector<situation_assessment_msgs::Fact> getGroupContains(StringVectorMap map);
+    vector<situation_assessment_msgs::Fact> calculateIsFacing(EntityMap map1, EntityMap map2); //which entity an agent is facing
+    vector<situation_assessment_msgs::Fact> getGroupContains(StringVectorMap map); //members of groups
     vector<situation_assessment_msgs::Fact> getDistances(EntityMap map1, EntityMap map2, PairMap* 
-    	entity_distances);
-    vector<situation_assessment_msgs::Fact> getIsMoving(EntityMap map);
+    	entity_distances); //Distances between entities in number
+    vector<situation_assessment_msgs::Fact> getIsMoving(EntityMap map); //calculates if entities are moving or not
     
-    vector<situation_assessment_msgs::Fact> getEntityType(EntityMap map);
+    vector<situation_assessment_msgs::Fact> getEntityType(EntityMap map); //objects, agents or what
 
     vector<situation_assessment_msgs::Fact> getDeltaDistances(EntityMap map1, EntityMap map2,
-    PairMap entity_distances);
-    vector<situation_assessment_msgs::Fact> getIsInArea(EntityMap map, PolygonMap areas); 
+    PairMap entity_distances); //delta distances of agents in numbers
+    vector<situation_assessment_msgs::Fact> getIsInArea(EntityMap map, PolygonMap areas);  //which agents are present in areas
 
-
-    vector<situation_assessment_msgs::Fact> getObjectTypes(EntityMap map);
+    // vector<situation_assessment_msgs::Fact> getObjectTypes(EntityMap map); //types of objects
 
 
 	private:

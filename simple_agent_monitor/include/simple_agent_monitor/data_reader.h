@@ -1,3 +1,10 @@
+/**
+    data_reader.h
+    author: Michelangelo Fiore
+
+	reads data from the used bridges for entities positions
+*/
+
 #ifndef DATA_READER_H
 #define DATA_READER_H
 

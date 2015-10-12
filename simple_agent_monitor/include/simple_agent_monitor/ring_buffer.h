@@ -22,7 +22,7 @@ public:
 	virtual ~RingBuffer();
 
 	void insert(T element);
-	vector<T> getSequence(int n);
+	vector<T> getSequence(int n);  //get the latest n elements in the sequence (0 returns empty vector)
 
 	void allocate(int size);
 	int size;
