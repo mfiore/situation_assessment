@@ -260,6 +260,7 @@ int main(int argc, char** argv) {
 		Entity robot_poses=data_reader.getRobotPoses();
 		EntityMap object_poses=data_reader.getObjectPoses();
 		EntityMap group_poses=data_reader.getGroupPoses();
+		EntityMap location_poses=data_reader.getLocationPoses();
 		StringVectorMap group_members=data_reader.getAgentGroups();
 
 		// if (agent_poses.size()>0) {
@@ -270,15 +271,22 @@ int main(int argc, char** argv) {
 			if (object_poses.size()>0) {
 				all_entities.insert(object_poses.begin(),object_poses.end());
 			}
+			EntityMap all_plus_locations=all_entities;
+			if (location_poses.size()>0) {
+				all_plus_locations.push_back(location_poses.begin(),location_poses.end());
+			}
 			updateEntityAreas(all_agents); //update areas linked to entities
 
 			//get facts
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
-			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
-			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_agents,areas);
+			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
+			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_entities,areas);
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
-			vector<situation_assessment_msgs::Fact> object_types=agent_monitors.getEntityType(object_poses);
+			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_plus_locations);
+			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_plus_locations);
+			vector<situation_assessment_msgs::Fact> has_areas=agent_monitors.hasArea(all_plus_locations,areas);
+
 
 			situation_assessment_msgs::FactList factList;
 			factList.fact_list=group_contains;
@@ -296,7 +304,6 @@ int main(int argc, char** argv) {
 			}
 			if (object_types.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),object_types.begin(),object_types.end());
-
 			}
 
 			factPublisher.publish(factList);

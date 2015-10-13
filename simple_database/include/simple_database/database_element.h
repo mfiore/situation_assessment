@@ -27,12 +27,9 @@ public:
             good = false;
         } else if (this->subject_ != "" && this->subject_ != other.subject_) {
             good = false; }
-        // } else if (this->value_.size()!=other.size() && this->value_.size()!=0) {
-            // good = false;
-        // }
-            else if (this->value_ != "" && this->value_ != other.value_) {
-                good=false;
-            }
+        } else if (this->value_.size()!=other.size() && this->value_.size()!=0) {
+            good = false;
+        }
         else if (this->predicate_.size()!=other.predicate_.size() && this->predicate_.size()!=0) {
             good=false;
         }
@@ -42,13 +39,13 @@ public:
         			good=false;
         		}
         	}
-            // if (good) {
-            //     for (int j=0; j<this->value.size();j++) {
-            //         if (this->value_[j]!=other.value_[j]) {
-            //             good=false;
-            //         }
-            //     }
-            // }
+            if (good) {
+                for (int j=0; j<this->value.size();j++) {
+                    if (this->value_[j]!=other.value_[j]) {
+                        good=false;
+                    }
+                }
+            }
         }
         return good;
     }
@@ -56,8 +53,7 @@ public:
     string model_;
     string subject_;
     vector<string> predicate_;
-    // vector<string>  value_;
-    string value_;
+    vector<string>  value_;
 private:
 
 

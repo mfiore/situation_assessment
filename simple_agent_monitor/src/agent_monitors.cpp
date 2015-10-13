@@ -155,13 +155,46 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityType(EntityMap m
 		new_fact.model=robot_name_;
 		new_fact.subject=entity->second.name;
 		new_fact.predicate.push_back("type");
-		new_fact.value=entity->second.type;
+		new_fact.value.push_back(entity->second.class);
+		new_fact.value.push_back(entity->second.type);
 		result.push_back(new_fact);
 	}
 	return result;
 }
 
-vector<situation_assessment_msgs::Fact> AgentMonitors::getHasArea(EntityMap map) {
+vector<situation_assessment_msgs::Fact> AgentMonitors::getHasArea(vector<string> area_names) {
+	vector<situation_assessment_msgs::Fact> result;
+	for (int i=0; i<area_names.size();i++) {
+		situation_assessment_msgs::Fact new_fact;
+
+		new_fact.model=robot_name_;
+		new_fact.subject=area_names[i];
+		new_fact.predicate.push_back("hasArea");
+		new_fact.value.push_back("true");
+		result.push_back(new_fact);
+	}
+	return result;
 	
 }
 
+vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityPoses(EntityMap map) {
+	vector<situation_assessment_msgs::Fact> result;
+	for (EntityMap::iterator it=map.begin(); it!=map.end();i++) {
+		situation_assessment_msgs::Fact new_fact;
+
+		new_fact.model=robot_name_;
+		new_fact.subject=it->first.name;
+		new_fact.predicate.push_back("pose");
+		geometry_msgs::Pose pose=it->second.pose.getSequence(1);
+		new_fact.value.push_back(it->second.pose.position.x);
+		new_fact.value.push_back(it->second.pose.position.y);
+		new_fact.value.push_back(it->second.pose.position.z);
+		new_fact.value.push_back(it->second.pose.orientation.x);
+		new_fact.value.push_back(it->second.pose.orientation.y);
+		new_fact.value.push_back(it->second.pose.orientation.z);
+		new_fact.value.push_back(it->second.pose.orientation.w);
+
+		result.push_back(new_fact);
+	}
+	return result;
+}

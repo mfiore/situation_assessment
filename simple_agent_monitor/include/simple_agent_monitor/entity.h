@@ -17,6 +17,7 @@ struct Entity {
 	string name;
 	RingBuffer<geometry_msgs::Pose> pose;
 	string type;
+	string class;
 };
 
 #endif

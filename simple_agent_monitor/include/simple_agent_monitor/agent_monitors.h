@@ -52,6 +52,9 @@ public:
     vector<situation_assessment_msgs::Fact> getDeltaDistances(EntityMap map1, EntityMap map2,
     PairMap entity_distances); //delta distances of agents in numbers
     vector<situation_assessment_msgs::Fact> getIsInArea(EntityMap map, PolygonMap areas);  //which agents are present in areas
+    vector<situation_assessment_msgs::Fact> getHasArea(vector<string> areas);  //which agents are present in areas
+    vector<situation_assessment_msgs::Fact> getEntityPoses(EntityMap map);
+
 
     // vector<situation_assessment_msgs::Fact> getObjectTypes(EntityMap map); //types of objects
 
