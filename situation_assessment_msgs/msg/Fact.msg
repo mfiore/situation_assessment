@@ -1,4 +1,4 @@
 string model
 string subject
 string[] predicate
-string value
+string[] value

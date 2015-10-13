@@ -184,7 +184,7 @@ void updateEntityAreas(EntityMap agent_poses) {
 			geometry_msgs::Point32 entity_center;
 			entity_center.x=this_entity_pose.position.x; 
 			entity_center.y=this_entity_pose.position.y;
-			double entity_orientation=tf::getYaw(this_entity_pose.orientation); 
+			double entity_orientation=tf::getYaw(this_entity_pose.orientation)-1.6; 
 			for (int i=0; i<area.points.size();i++) {
 				area.points[i].x+=this_entity_pose.position.x;
 				area.points[i].y+=this_entity_pose.position.y;
@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
 		EntityMap group_poses=data_reader.getGroupPoses();
 		StringVectorMap group_members=data_reader.getAgentGroups();
 
-		if (agent_poses.size()>0) {
+		// if (agent_poses.size()>0) {
 			//create some containers with only humans, human and robot, or human robot and objects.
 			EntityMap all_agents=agent_poses;
 			all_agents[robotName]=robot_poses;
@@ -317,7 +317,7 @@ int main(int argc, char** argv) {
 			updateDatabase(&add_database_client,&remove_database_client,factList.fact_list,old_fact_list);
 
 			old_fact_list=factList.fact_list;
-	 	}
+	 	// }
 		rate.sleep();
 	}
 	ros::shutdown();
