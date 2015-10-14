@@ -17,7 +17,7 @@ using namespace std;
 
 class DatabaseElement {
 public:
-    DatabaseElement(string model, string subject, vector<string> predicate, string value);
+    DatabaseElement(string model, string subject, vector<string> predicate, vector<string> value);
     DatabaseElement(const DatabaseElement& orig);
     virtual ~DatabaseElement();
 
@@ -26,8 +26,8 @@ public:
         if (this->model_ != "" && this->model_ != other.model_) {
             good = false;
         } else if (this->subject_ != "" && this->subject_ != other.subject_) {
-            good = false; }
-        } else if (this->value_.size()!=other.size() && this->value_.size()!=0) {
+            good = false; 
+        } else if (this->value_.size()!=other.value_.size() && this->value_.size()!=0) {
             good = false;
         }
         else if (this->predicate_.size()!=other.predicate_.size() && this->predicate_.size()!=0) {
@@ -40,7 +40,7 @@ public:
         		}
         	}
             if (good) {
-                for (int j=0; j<this->value.size();j++) {
+                for (int j=0; j<this->value_.size();j++) {
                     if (this->value_[j]!=other.value_[j]) {
                         good=false;
                     }
@@ -53,7 +53,7 @@ public:
     string model_;
     string subject_;
     vector<string> predicate_;
-    vector<string>  value_;
+    vector<string> value_;
 private:
 
 

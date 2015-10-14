@@ -302,8 +302,14 @@ int main(int argc, char** argv) {
 			if (isInArea.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),isInArea.begin(),isInArea.end());
 			}
-			if (object_types.size()>0) {
-				factList.fact_list.insert(factList.fact_list.end(),object_types.begin(),object_types.end());
+			if (entity_types.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),entity_types.begin(),entity_types.end());
+			}
+			if (entity_poses.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),entity_poses.begin(),entity_poses.end());
+			}
+			if (has_areas.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),has_areas.begin(),has_areas.end());
 			}
 
 			factPublisher.publish(factList);

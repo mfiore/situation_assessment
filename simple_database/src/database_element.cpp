@@ -7,7 +7,7 @@
 
 #include "simple_database/database_element.h"
 
-DatabaseElement::DatabaseElement(string model, string subject, vector<string> predicate, string value) {
+DatabaseElement::DatabaseElement(string model, string subject, vector<string> predicate, vector<string> value) {
     model_=model;
     subject_=subject;
     predicate_=predicate;

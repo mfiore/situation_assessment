@@ -155,7 +155,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityType(EntityMap m
 		new_fact.model=robot_name_;
 		new_fact.subject=entity->second.name;
 		new_fact.predicate.push_back("type");
-		new_fact.value.push_back(entity->second.class);
+		new_fact.value.push_back(entity->second.category);
 		new_fact.value.push_back(entity->second.type);
 		result.push_back(new_fact);
 	}
