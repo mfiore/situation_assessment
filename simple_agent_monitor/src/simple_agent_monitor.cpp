@@ -63,14 +63,15 @@ GeometryPolygonMap entity_areas;	//areas linked to entities
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
 
+	ROS_INFO("RECEIVED REQUEST TO ADD AREA ");
 	if (req.linked_to_entity!="") { //if linked will update the area with the entity position
+    	ROS_INFO("Adding a new area to entity %s",req.linked_to_entity.c_str());
 		entity_areas[req.linked_to_entity]=req.area;
-		ROS_INFO("Adding a new area to entity %s",req.linked_to_entity.c_str());
 	}
 	else {
+		ROS_INFO("Adding a new area to monitor. Coordinates:");	
 		geometry_msgs::Polygon area=req.area;
 
-		ROS_INFO("Adding a new area to monitor. Coordinates:");	
 		Point pts[area.points.size()];
 		int i=0;
 		for (geometry_msgs::Point32 point:area.points) {
