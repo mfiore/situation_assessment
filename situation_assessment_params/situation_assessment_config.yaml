@@ -1,11 +1,11 @@
 ---
 situation_assessment:
-    doc_path: /home/mfiore/ros_workspaces/my_spencer_ws/src/spencer_situation_assessment/spencer_symbolic_map/maps/
-    doc_name: spencer_map
+    doc_path: /home/mfiore/ros_workspaces/my_spencer_ws/src/spencer_situation_assessment/spencer_symbolic_map/maps/Adream_demo/
+    doc_name: Adream_demo
     information_screen_area_b: 2
     information_screen_area_h: 3
-    gate_area_b: 2
-    gate_area_3: 5
+    gate_area_b: 3
+    gate_area_h: 5
     ring_buffer_length: 10
     use_orientation: false
     tf_bridge:

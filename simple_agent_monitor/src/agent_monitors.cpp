@@ -137,12 +137,15 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getIsInArea(EntityMap map
 					value_areas.push_back(an_area->first);
 				}
 			}
-			situation_assessment_msgs::Fact new_fact;
-			new_fact.model=robot_name_;
-			new_fact.subject=entity->first;
-			new_fact.predicate.push_back("isInArea");
-			new_fact.value=value_areas;
-			result.push_back(new_fact);		
+			value_areas.push_back("this");
+			if (value_areas.size()>0) {
+				situation_assessment_msgs::Fact new_fact;
+				new_fact.model=robot_name_;
+				new_fact.subject=entity->first;
+				new_fact.predicate.push_back("isInArea");
+				new_fact.value=value_areas;
+				result.push_back(new_fact);
+			}		
 		}
 		return result;
 
@@ -159,6 +162,21 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityType(EntityMap m
 		new_fact.value.push_back(entity->second.type);
 		result.push_back(new_fact);
 	}
+	situation_assessment_msgs::Fact new_fact,new_fact_2;
+	new_fact.model=robot_name_;
+	new_fact.subject="this";
+	new_fact.predicate.push_back("type");
+	new_fact.value.push_back("location");
+	new_fact.value.push_back("location that includes everyone");
+	result.push_back(new_fact);	
+
+	new_fact_2.model=robot_name_;
+	new_fact_2.subject=robot_name_;
+	new_fact_2.predicate.push_back("type");
+	new_fact_2.value.push_back("agent");
+	new_fact_2.value.push_back("robot");
+	result.push_back(new_fact_2);	
+
 	return result;
 }
 

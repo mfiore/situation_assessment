@@ -35,6 +35,7 @@ using namespace std;
 struct Entity {
 	string name;
 	string type;
+	string category;
 	geometry_msgs::Pose pose;
 };
 
