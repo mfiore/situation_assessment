@@ -38,7 +38,7 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
 		predicate_string=predicate_string+req.query.predicate[i]+" ";
 	}
 	ROS_INFO("Received query %s %s %s %s ",req.query.model.c_str(), req.query.subject.c_str(),
-			predicate_string.c_str(),  req.query.value.c_str() );
+			predicate_string.c_str(),  req.query.value[0].c_str() );
 	DatabaseElement element(req.query.model, req.query.subject, req.query.predicate, req.query.value);
 	vector<DatabaseElement> result = database.getElements(element);
 	vector<situation_assessment_msgs::Fact> return_facts;
@@ -92,7 +92,7 @@ bool addFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
     ROS_INFO("Received request to add facts:");
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
-        ROS_INFO("%s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value.c_str());
+        ROS_INFO("%s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value[0].c_str());
         DatabaseElement element(fact.model.c_str(),fact.subject,fact.predicate,fact.value);
 
         vector<DatabaseElement> found_elements=database.getElements(element);
@@ -108,7 +108,7 @@ bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
     ROS_INFO("Received request to remove facts");
     // ROS_INFO("Database size before remove is %ld",database.database_.size());
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
-        ROS_INFO("Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value.c_str());
+        ROS_INFO("Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value[0].c_str());
         DatabaseElement element(robot_name,fact.subject,fact.predicate,fact.value);
         database.removeElement(element);
     }
@@ -121,7 +121,7 @@ bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
 
 void publishWorldStatus() {
     situation_assessment_msgs::FactList fact_list;
-    DatabaseElement empty_element("","",vector<string>(),"");
+    DatabaseElement empty_element("","",vector<string>(),vector<string>());
 
     ros::Rate r(1);
     while (ros::ok()) {

@@ -273,7 +273,7 @@ int main(int argc, char** argv) {
 			}
 			EntityMap all_plus_locations=all_entities;
 			if (location_poses.size()>0) {
-				all_plus_locations.push_back(location_poses.begin(),location_poses.end());
+				all_plus_locations.insert(location_poses.begin(),location_poses.end());
 			}
 			updateEntityAreas(all_agents); //update areas linked to entities
 
@@ -285,7 +285,19 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
 			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_plus_locations);
 			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_plus_locations);
-			vector<situation_assessment_msgs::Fact> has_areas=agent_monitors.hasArea(all_plus_locations,areas);
+
+			vector<string> area_names;
+			for (PolygonMap::iterator it=areas.begin();it!=areas.end();it++) {
+				area_names.push_back(it->first);
+			}
+			vector<string> entity_areas_names;
+			for (GeometryPolygonMap::iterator it=entity_areas.begin();it!=entity_areas.end();it++) {
+				entity_areas_names.push_back(it->first);
+			}
+
+
+			vector<situation_assessment_msgs::Fact> has_areas=agent_monitors.getHasArea(area_names);
+			vector<situation_assessment_msgs::Fact> has_areas_2=agent_monitors.getHasArea(entity_areas_names);
 
 
 			situation_assessment_msgs::FactList factList;
@@ -310,6 +322,9 @@ int main(int argc, char** argv) {
 			}
 			if (has_areas.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),has_areas.begin(),has_areas.end());
+			}
+			if (has_areas_2.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),has_areas_2.begin(),has_areas_2.end());
 			}
 
 			factPublisher.publish(factList);

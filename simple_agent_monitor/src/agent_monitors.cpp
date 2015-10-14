@@ -15,17 +15,16 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::calculateIsFacing(EntityM
 			if (entity2->first!=entity1->first) {
 				pose2=entity2->second.pose.getSequence(1)[0];
 				bool value=isFacing(pose1,pose2.position);
-				facing_values.push_back(value);
+				facing_values.push_back(entity2->first);
 			}
 		}
 		if (facing_values.size()>0) {
-		situation_assessment_msgs::Fact f;
-		f.model=robot_name_;
-		f.subject=entity1->first;
-		f.predicate.push_back("isFacing");
-		f.predicate.push_back(entity2->first);
-		f.value.push_back(to_string(value));
-		result.push_back(f);
+			situation_assessment_msgs::Fact f;
+			f.model=robot_name_;
+			f.subject=entity1->first;
+			f.predicate.push_back("isFacing");
+			f.value=facing_values;
+			result.push_back(f);
 		}
 	}
 	return result;
@@ -33,6 +32,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::calculateIsFacing(EntityM
 vector<situation_assessment_msgs::Fact> AgentMonitors::getGroupContains(StringVectorMap map) {
 	vector<situation_assessment_msgs::Fact> result;
 	for (StringVectorMap::iterator group_members=map.begin();group_members!=map.end();group_members++) {
+		situation_assessment_msgs::Fact f;
 		f.model=robot_name_;
 		f.subject=group_members->first;
 		f.predicate.push_back("contains");
@@ -179,20 +179,20 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getHasArea(vector<string>
 
 vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityPoses(EntityMap map) {
 	vector<situation_assessment_msgs::Fact> result;
-	for (EntityMap::iterator it=map.begin(); it!=map.end();i++) {
+	for (EntityMap::iterator it=map.begin(); it!=map.end();it++) {
 		situation_assessment_msgs::Fact new_fact;
 
 		new_fact.model=robot_name_;
-		new_fact.subject=it->first.name;
+		new_fact.subject=it->second.name;
 		new_fact.predicate.push_back("pose");
-		geometry_msgs::Pose pose=it->second.pose.getSequence(1);
-		new_fact.value.push_back(it->second.pose.position.x);
-		new_fact.value.push_back(it->second.pose.position.y);
-		new_fact.value.push_back(it->second.pose.position.z);
-		new_fact.value.push_back(it->second.pose.orientation.x);
-		new_fact.value.push_back(it->second.pose.orientation.y);
-		new_fact.value.push_back(it->second.pose.orientation.z);
-		new_fact.value.push_back(it->second.pose.orientation.w);
+		geometry_msgs::Pose pose=it->second.pose.getSequence(1)[0];
+		new_fact.value.push_back(to_string(pose.position.x));
+		new_fact.value.push_back(to_string(pose.position.y));
+		new_fact.value.push_back(to_string(pose.position.z));
+		new_fact.value.push_back(to_string(pose.orientation.x));
+		new_fact.value.push_back(to_string(pose.orientation.y));
+		new_fact.value.push_back(to_string(pose.orientation.z));
+		new_fact.value.push_back(to_string(pose.orientation.w));
 
 		result.push_back(new_fact);
 	}

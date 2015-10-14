@@ -66,6 +66,7 @@ find_package(catkin REQUIRED roscpp rospy message_generation std_msgs message_ru
    QueryDatabase.srv
    DatabaseRequest.srv
    GetMap.srv
+   GetLocations.srv
  )
 
 

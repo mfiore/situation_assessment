@@ -14,6 +14,7 @@
 #include <situation_assessment_msgs/NamedPoseList.h>
 #include <situation_assessment_msgs/Group.h>
 #include <situation_assessment_msgs/GroupList.h>
+#include <situation_assessment_msgs/GetLocations.h>
 
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Point32.h>
@@ -53,7 +54,7 @@ private:
 	void groupsCallback(situation_assessment_msgs::GroupList msg);
 	void locationsHelper();
 
-	void handleEntityMap(situation_assessment_msgs::NamedPoseList msg, EntityMap* map);
+	void handleEntityMap(situation_assessment_msgs::NamedPoseList msg, EntityMap* map, string category);
 
 
 	ros::NodeHandle node_handle_;
