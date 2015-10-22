@@ -45,6 +45,7 @@ node_handle_(node_handle) {
 
 void DataLib::publishData() {
 	if (track_robot_) {
+
 		situation_assessment_msgs::NamedPose msg;
 		msg.name=robot_name_;
 		msg.pose=robot_pose_.pose;
@@ -52,6 +53,7 @@ void DataLib::publishData() {
 		robot_pub_.publish(msg);
 	}
 	if (track_agents_){
+
 		situation_assessment_msgs::NamedPoseList list_msg=getNamedPoseListMsg(agent_poses_);
 		agents_pub_.publish(list_msg);
 	}

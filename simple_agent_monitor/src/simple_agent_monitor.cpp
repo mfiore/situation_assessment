@@ -8,6 +8,7 @@
 
 //ros stuff
 #include <ros/ros.h>
+#include <ros/callback_queue.h>
 
 //msgs
 #include <geometry_msgs/Pose.h>
@@ -20,6 +21,7 @@
 #include "situation_assessment_msgs/Fact.h"
 #include "situation_assessment_msgs/FactList.h"
 #include "situation_assessment_msgs/AreaList.h"
+#include "situation_assessment_msgs/SwitchOrientation.h"
 
 //services
 #include <situation_assessment_msgs/AddArea.h>
@@ -28,6 +30,9 @@
 
 // //boost
 #include <boost/polygon/polygon.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp> 
+#include <boost/thread/condition_variable.hpp>
 
 //other
 #include <utility>
@@ -59,23 +64,34 @@ GeometryPolygonMap msg_areas_map;   //areas as geometry msgs, used for publishin
 GeometryPolygonMap entity_areas;	//areas linked to entities
 
 
+// boost::mutex mutex_has_published;
+// bool has_published=false;
+// boost::condition_variable condition_has_published;
+
+bool switch_orientation;
+
+bool switchOrientation(situation_assessment_msgs::SwitchOrientation::Request &req, situation_assessment_msgs::SwitchOrientation::Response &res) {
+	switch_orientation=req.backward;
+}
+
+
 //service to add a geometrical area in the environment
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
 
 	if (req.linked_to_entity!="") { //if linked will update the area with the entity position
 		entity_areas[req.linked_to_entity]=req.area;
-		ROS_INFO("Adding a new area to entity %s",req.linked_to_entity.c_str());
+		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to entity %s",req.linked_to_entity.c_str());
 	}
 	else {
 		geometry_msgs::Polygon area=req.area;
 
-		ROS_INFO("Adding a new area to monitor. Coordinates:");	
+		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to monitor. Coordinates:");	
 		Point pts[area.points.size()];
 		int i=0;
 		for (geometry_msgs::Point32 point:area.points) {
 			pts[i]=gtl::construct<Point>(point.x,point.y);
-			ROS_INFO("- %f %f",point.x,point.y);
+			ROS_INFO("SIMPLE_AGENT_MONITOR - %f %f",point.x,point.y);
 			i++;
 		}
 		Polygon poly;
@@ -87,7 +103,16 @@ bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessm
 
 	res.result=true;
 	return true;
-}
+}//service to add a geometrical area in the environment
+// bool hasPublished(situation_assessment_msgs::EmptyRequest::Request &req, situation_assessment_msgs::EmptyRequest::Response &res) {
+// 	ROS_INFO("SIMPLE_AGENT_MONITOR in has published");
+// 	boost::unique_lock<boost::mutex> lock(mutex_has_published);
+// 	while (!has_published) {
+// 		condition_has_published.wait(lock);
+// 	}
+// 	ROS_INFO("SIMPLE_AGENT_MONITOR out has published");
+// 	return true;
+// }
 
 //removes an area
 bool removeArea(situation_assessment_msgs::NameRequest::Request &req, situation_assessment_msgs::NameRequest::Response &res) {
@@ -184,7 +209,14 @@ void updateEntityAreas(EntityMap agent_poses) {
 			geometry_msgs::Point32 entity_center;
 			entity_center.x=this_entity_pose.position.x; 
 			entity_center.y=this_entity_pose.position.y;
-			double entity_orientation=tf::getYaw(this_entity_pose.orientation)-1.6; 
+
+			double entity_orientation;
+			if (entity_name==robotName && switch_orientation) {
+				entity_orientation=tf::getYaw(this_entity_pose.orientation)-1.6-3.14; 
+			}
+			else {
+				entity_orientation=tf::getYaw(this_entity_pose.orientation)-1.6; 
+			}
 			for (int i=0; i<area.points.size();i++) {
 				area.points[i].x+=this_entity_pose.position.x;
 				area.points[i].y+=this_entity_pose.position.y;
@@ -221,9 +253,11 @@ int main(int argc, char** argv) {
 
 	ros::NodeHandle node_handle;
 
+	ros::CallbackQueue my_callback_queue;
+
 	node_handle.getParam("/robot/name",robotName);
-	ROS_INFO("Init simple_agent_monitor");
-	ROS_INFO("Robot name is %s",robotName.c_str());
+	ROS_INFO("SIMPLE_AGENT_MONITOR Init simple_agent_monitor");
+	ROS_INFO("SIMPLE_AGENT_MONITOR Robot name is %s",robotName.c_str());
 
 	DataReader data_reader(node_handle); //reads entities data
 
@@ -234,23 +268,29 @@ int main(int argc, char** argv) {
 
 	ros::ServiceServer add_area_server=node_handle.advertiseService("situation_assessment/add_area",addArea);
 	ros::ServiceServer remove_area_server=node_handle.advertiseService("situation_assessment/remove_area",removeArea);
+	ros::ServiceServer switch_orientation_server=node_handle.advertiseService("situation_assessment/switch_orientation",switchOrientation);
+	// ros::ServiceServer has_published_server=node_handle.advertiseService("situation_assessment/has_published",hasPublished,&my_callback_queue);
 
 
 	ros::ServiceClient add_database_client=node_handle.serviceClient<situation_assessment_msgs::DatabaseRequest>("situation_assessment/add_facts");
 	ros::ServiceClient remove_database_client=node_handle.serviceClient<situation_assessment_msgs::DatabaseRequest>("situation_assessment/remove_facts");
 
-	ROS_INFO("Waiting for database to be up");
+	ROS_INFO("SIMPLE_AGENT_MONITOR Waiting for database to be up");
 	add_database_client.waitForExistence();
 	remove_database_client.waitForExistence();
 
-	ROS_INFO("Advertising topics and services");
+	ROS_INFO("SIMPLE_AGENT_MONITOR Advertising topics and services");
 
-	ros::Rate rate(3);
-	ROS_INFO("Starting computation");
+	ros::Rate rate(5);
+	ROS_INFO("SIMPLE_AGENT_MONITOR Starting computation");
 
 	PairMap entity_distances;
 
 	vector<situation_assessment_msgs::Fact> old_fact_list;
+
+	bool first_time=true;
+
+	int n_loops=0;
 
 	while (ros::ok()) {
 		ros::spinOnce();
@@ -345,6 +385,7 @@ int main(int argc, char** argv) {
 			updateDatabase(&add_database_client,&remove_database_client,factList.fact_list,old_fact_list);
 
 			old_fact_list=factList.fact_list;
+
 	 	// }
 		rate.sleep();
 	}

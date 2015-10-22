@@ -67,6 +67,8 @@ find_package(catkin REQUIRED roscpp rospy message_generation std_msgs message_ru
    DatabaseRequest.srv
    GetMap.srv
    GetLocations.srv
+   EmptyRequest.srv
+   SwitchOrientation.srv
  )
 
 
