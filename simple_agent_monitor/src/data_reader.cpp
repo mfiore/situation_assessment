@@ -1,4 +1,4 @@
-p#include <simple_agent_monitor/data_reader.h>
+#include <simple_agent_monitor/data_reader.h>
 
 DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	node_handle.getParam("situation_assessment/ring_buffer_length",ring_buffer_length_);
