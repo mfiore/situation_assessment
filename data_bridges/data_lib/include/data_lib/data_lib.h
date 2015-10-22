@@ -75,6 +75,7 @@ protected:
 	ros::Publisher robot_pub_,agents_pub_,objects_pub_,groups_pub_;
 
 
+
 	ros::NodeHandle node_handle_;
 };
 

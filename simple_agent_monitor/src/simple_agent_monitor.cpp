@@ -259,9 +259,6 @@ int main(int argc, char** argv) {
 	ROS_INFO("SIMPLE_AGENT_MONITOR Init simple_agent_monitor");
 	ROS_INFO("SIMPLE_AGENT_MONITOR Robot name is %s",robotName.c_str());
 
-	DataReader data_reader(node_handle); //reads entities data
-
-	AgentMonitors agent_monitors(robotName); //monitors on entities data
 
 	ros::Publisher factPublisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/agent_fact_list",1000);
 	ros::Publisher areaPublisher=node_handle.advertise<situation_assessment_msgs::AreaList>("situation_assessment/area_polygons",1000);
@@ -271,6 +268,7 @@ int main(int argc, char** argv) {
 	ros::ServiceServer switch_orientation_server=node_handle.advertiseService("situation_assessment/switch_orientation",switchOrientation);
 	// ros::ServiceServer has_published_server=node_handle.advertiseService("situation_assessment/has_published",hasPublished,&my_callback_queue);
 
+	ROS_INFO("SIMPLE_AGENT_MONITOR Advertising services");
 
 	ros::ServiceClient add_database_client=node_handle.serviceClient<situation_assessment_msgs::DatabaseRequest>("situation_assessment/add_facts");
 	ros::ServiceClient remove_database_client=node_handle.serviceClient<situation_assessment_msgs::DatabaseRequest>("situation_assessment/remove_facts");
@@ -280,6 +278,12 @@ int main(int argc, char** argv) {
 	remove_database_client.waitForExistence();
 
 	ROS_INFO("SIMPLE_AGENT_MONITOR Advertising topics and services");
+
+	DataReader data_reader(node_handle); //reads entities data
+
+	ROS_INFO("SIMPLE_AGENT_MONITOR Connected to data");
+	AgentMonitors agent_monitors(robotName); //monitors on entities data
+	ROS_INFO("SIMPLE_AGENT_MONITOR Started monitors");
 
 	ros::Rate rate(5);
 	ROS_INFO("SIMPLE_AGENT_MONITOR Starting computation");

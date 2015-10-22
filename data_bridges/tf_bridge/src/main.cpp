@@ -7,10 +7,11 @@ int main (int argc,char** argv) {
 
 	TfBridge tf_bridge(node_handle);
 
-	ros::Rate r(10);
+	ros::Rate r(3);
 	while (ros::ok()) {
 		tf_bridge.getPoses();
 		tf_bridge.publishData();
+		r.sleep();
 	}
 
 

@@ -25,6 +25,9 @@ public:
 	void getPoses();
 private:
 	geometry_msgs::Pose tfToGeometry(tf::StampedTransform transform);
+
+	tf::TransformListener listener_;
+
 };
 
 #endif
