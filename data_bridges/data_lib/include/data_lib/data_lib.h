@@ -35,6 +35,7 @@ using namespace std;
 struct Entity {
 	string name;
 	string type;
+	string category;
 	geometry_msgs::Pose pose;
 };
 
@@ -72,6 +73,7 @@ protected:
 	EntityMap object_poses_;
 	StringVectorMap agent_groups_;
 	ros::Publisher robot_pub_,agents_pub_,objects_pub_,groups_pub_;
+
 
 
 	ros::NodeHandle node_handle_;

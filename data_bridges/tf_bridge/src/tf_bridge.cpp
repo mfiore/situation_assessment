@@ -16,7 +16,6 @@ geometry_msgs::Pose TfBridge::tfToGeometry(tf::StampedTransform transform) {
 }
 
 void TfBridge::getPoses() {
-	tf::TransformListener listener;
 	//get human agents
 	geometry_msgs::Pose new_group_pose;
 	new_group_pose.position.x=0;
@@ -27,11 +26,11 @@ void TfBridge::getPoses() {
 		BOOST_FOREACH(string agent_name,agent_list_) {
 			try {
 				tf::StampedTransform transform;
-				listener.waitForTransform("map", agent_name, ros::Time(0), ros::Duration(1.0) );
+				listener_.waitForTransform("map", agent_name, ros::Time(0), ros::Duration(1.0) );
 				if (!ros::ok()) {
 					return;
 				}
-				listener.lookupTransform("map",agent_name,ros::Time(0),transform);
+				listener_.lookupTransform("map",agent_name,ros::Time(0),transform);
 
 				geometry_msgs::Pose pose=tfToGeometry(transform);
 				agent_poses_[agent_name].pose=pose;
@@ -68,11 +67,11 @@ void TfBridge::getPoses() {
 		for (int i=0; object_list_.size(); i++) {
 			try {
 				tf::StampedTransform transform;
-				listener.waitForTransform("map", object_list_[i], ros::Time(0), ros::Duration(1.0) );
+				listener_.waitForTransform("map", object_list_[i], ros::Time(0), ros::Duration(1.0) );
 				if (!ros::ok()) {
 					return;
 				}
-				listener.lookupTransform("map",object_list_[i],ros::Time(0),transform);
+				listener_.lookupTransform("map",object_list_[i],ros::Time(0),transform);
 
 				geometry_msgs::Pose pose=tfToGeometry(transform);
 				object_poses_[object_list_[i]].pose=pose;
@@ -86,17 +85,17 @@ void TfBridge::getPoses() {
 	if (track_robot_) {
 		try {
 			tf::StampedTransform transform;
-			listener.waitForTransform("map", "base_link", ros::Time(0), ros::Duration(1.0) );
+			listener_.waitForTransform("map", "base_link", ros::Time(0), ros::Duration(1.0) );
 			if (!ros::ok()) {
 					return;
 				}
-			listener.lookupTransform("/map","base_link",ros::Time(0),transform);
+			listener_.lookupTransform("/map","base_link",ros::Time(0),transform);
 			geometry_msgs::Pose pose=tfToGeometry(transform);
 			robot_pose_.pose=pose;
 			robot_pose_.name=robot_name_;
 			robot_pose_.type="ROBOT";
 		} catch(tf::TransformException ex) {
-			ROS_ERROR("%s",ex.what());
+			ROS_ERROR("TF_BRIDGE %s",ex.what());
 		}
 	}
 

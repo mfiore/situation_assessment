@@ -12,19 +12,19 @@ node_handle_(node_handle) {
 	node_handle_.getParam("/situation_assessment/human_names",agent_list_);
 	node_handle_.getParam("/situation_assessment/object_names",object_list_);
 
-	ROS_INFO("Parameters are:");
-	ROS_INFO("Tracking robot %d:",track_robot_);
-	ROS_INFO("Tracking agents %d:",track_agents_);
-	ROS_INFO("Tracking objects %d:",track_objects_);
-	ROS_INFO("Tracking groups %d:",track_groups_);
-	ROS_INFO("Robot name %s",robot_name_.c_str());
-	ROS_INFO("Known agents");
+	ROS_INFO("DATA_LIB   Parameters are:");
+	ROS_INFO("DATA_LIB   Tracking robot %d:",track_robot_);
+	ROS_INFO("DATA_LIB   Tracking agents %d:",track_agents_);
+	ROS_INFO("DATA_LIB   Tracking objects %d:",track_objects_);
+	ROS_INFO("DATA_LIB   Tracking groups %d:",track_groups_);
+	ROS_INFO("DATA_LIB   Robot name %s",robot_name_.c_str());
+	ROS_INFO("DATA_LIB   Known agents");
 	BOOST_FOREACH(string agent, agent_list_) {
-		ROS_INFO("- %s",agent.c_str());
+		ROS_INFO("DATA_LIB   - %s",agent.c_str());
 	}	
-	ROS_INFO("Known Objects");
+	ROS_INFO("DATA_LIB   Known Objects");
 	BOOST_FOREACH(string object, object_list_) {
-		ROS_INFO("- %s",object.c_str());
+		ROS_INFO("DATA_LIB   - %s",object.c_str());
 	}
 
 
@@ -35,16 +35,17 @@ node_handle_(node_handle) {
 		agents_pub_=node_handle_.advertise<situation_assessment_msgs::NamedPoseList>("situation_assessment/agent_poses",1000);
 	}
 	if (track_objects_) {
-		objects_pub_=node_handle_.advertise<situation_assessment_msgs::NamedPoseList>("situation_assessment/object_poses_",1000);
+		objects_pub_=node_handle_.advertise<situation_assessment_msgs::NamedPoseList>("situation_assessment/object_poses",1000);
 	}
 	if (track_groups_) {
 		groups_pub_=node_handle_.advertise<situation_assessment_msgs::GroupList>("situation_assessment/group_poses",1000);
 	}
-	ROS_INFO("Advertising appropriate topics");
+	ROS_INFO("DATA_LIB   Advertising appropriate topics");
 }
 
 void DataLib::publishData() {
 	if (track_robot_) {
+
 		situation_assessment_msgs::NamedPose msg;
 		msg.name=robot_name_;
 		msg.pose=robot_pose_.pose;
@@ -52,6 +53,7 @@ void DataLib::publishData() {
 		robot_pub_.publish(msg);
 	}
 	if (track_agents_){
+
 		situation_assessment_msgs::NamedPoseList list_msg=getNamedPoseListMsg(agent_poses_);
 		agents_pub_.publish(list_msg);
 	}

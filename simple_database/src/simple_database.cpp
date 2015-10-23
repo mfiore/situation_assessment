@@ -32,17 +32,28 @@ string robot_name;
 
 bool query(situation_assessment_msgs::QueryDatabase::Request &req,
         situation_assessment_msgs::QueryDatabase::Response &res) {
+    ROS_INFO("SIMPLE_DATABASE Got query");
 
 	string predicate_string="";
-	for (int i=0; i<req.query.predicate.size();i++) {
+	string value_string="";
+    for (int i=0; i<req.query.predicate.size();i++) {
 		predicate_string=predicate_string+req.query.predicate[i]+" ";
 	}
-	ROS_INFO("Received query %s %s %s %s ",req.query.model.c_str(), req.query.subject.c_str(),
-			predicate_string.c_str(),  req.query.value.c_str() );
+    for (int i=0;i<req.query.value.size();i++) {
+        value_string=value_string+req.query.value[i]+" ";
+    }
+
+    ROS_INFO("value size %ld",req.query.value.size());
+
+    vector<string> predicate_try;
+    predicate_try.push_back("type");
+
+	ROS_INFO("SIMPLE_DATABASE Received query %s %s %s %s ",req.query.model.c_str(), req.query.subject.c_str(),
+			predicate_string.c_str(),  value_string.c_str() );
 	DatabaseElement element(req.query.model, req.query.subject, req.query.predicate, req.query.value);
 	vector<DatabaseElement> result = database.getElements(element);
 	vector<situation_assessment_msgs::Fact> return_facts;
-	ROS_INFO("Return");
+	ROS_INFO("SIMPLE_DATABASE Return %ld elements",result.size());
 	for (DatabaseElement el : result) {
         situation_assessment_msgs::Fact f;
         f.model = el.model_;
@@ -51,8 +62,19 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
         f.value = el.value_;
         return_facts.push_back(f);
 
-        // ROS_INFO("%s %s %s ",f.model.c_str(), f.subject.c_str()
-        		// , f.value.c_str() );
+        string res_predicate_string, res_value_string;
+        res_predicate_string="";
+        res_value_string="";
+        for (int i=0; i<f.predicate.size();i++) {
+            res_predicate_string=res_predicate_string+f.predicate[i];
+        }        
+        for (int i=0; i<f.value.size();i++) {
+            res_value_string=res_value_string+f.value[i];
+        }
+
+
+        ROS_INFO("SIMPLE_DATABASE %s %s %s ",f.model.c_str(), f.subject.c_str()
+        		,res_predicate_string.c_str(), res_value_string.c_str() );
     }
     res.result = return_facts;
 
@@ -90,9 +112,10 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
 
 bool addFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
-    ROS_INFO("Received request to add facts:");
+    // ROS_INFO("SIMPLE_DATABASE Received request to add facts:");
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
-        ROS_INFO("%s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value.c_str());
+        // ROS_INFO("SIMPLE_DATABASE %s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str());
+        // ROS_INFO("SIMPLE_DATABASE %s",fact.value[0].c_str());
         DatabaseElement element(fact.model.c_str(),fact.subject,fact.predicate,fact.value);
 
         vector<DatabaseElement> found_elements=database.getElements(element);
@@ -100,19 +123,20 @@ bool addFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
          database.addElement(element);
         }
     }
+    // ROS_INFO("SIMPLE_DATABASE Finishing with adding facts");
     return true;
 }
 
 bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
-    ROS_INFO("Received request to remove facts");
-    // ROS_INFO("Database size before remove is %ld",database.database_.size());
+    // ROS_INFO("SIMPLE_DATABASE Received request to remove facts");
+    // ROS_INFO("SIMPLE_DATABASE Database size before remove is %ld",database.database_.size());
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
-        ROS_INFO("Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value.c_str());
+        // ROS_INFO("SIMPLE_DATABASE Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value[0].c_str());
         DatabaseElement element(robot_name,fact.subject,fact.predicate,fact.value);
         database.removeElement(element);
     }
-    // ROS_INFO("Database size after remove is %ld",database.database_.size());
+    // ROS_INFO("SIMPLE_DATABASE Database size after remove is %ld",database.database_.size());
 
     return true;
 
@@ -121,7 +145,7 @@ bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
 
 void publishWorldStatus() {
     situation_assessment_msgs::FactList fact_list;
-    DatabaseElement empty_element("","",vector<string>(),"");
+    DatabaseElement empty_element("","",vector<string>(),vector<string>());
 
     ros::Rate r(1);
     while (ros::ok()) {
@@ -151,23 +175,23 @@ int main(int argc, char **argv) {
 
     node_handle.getParam("/robot/name",robot_name);
 
-    ROS_INFO("Init simple_database");
+    ROS_INFO("SIMPLE_DATABASE Init simple_database");
 
     ros::ServiceServer service_add = node_handle.advertiseService("situation_assessment/add_facts", addFacts);
     ros::ServiceServer service_remove = node_handle.advertiseService("situation_assessment/remove_facts", removeFacts);
     ros::ServiceServer service_query = node_handle.advertiseService("situation_assessment/query_database", query);
 
-    ROS_INFO("Advertising services");
+    ROS_INFO("SIMPLE_DATABASE Advertising services");
     world_status_publisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/world_status",1000);
 
     // Server action_server(n, "situation_assessment/monitor_facts", 
     // boost::bind(&monitorFacts,&action_server), false);
-    // ROS_INFO("Ready to monitor facts");
+    // ROS_INFO("SIMPLE_DATABASE Ready to monitor facts");
 
     // ros::Subscriber sub = node_handle.subscribe("/situation_assessment/agentFactList", 1000, simpleAgentMonitorCallback);
 
 
-    ROS_INFO("Started database");
+    ROS_INFO("SIMPLE_DATABASE Started database");
 
     boost::thread t(&publishWorldStatus);
 

@@ -3,17 +3,22 @@
 DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	node_handle.getParam("situation_assessment/ring_buffer_length",ring_buffer_length_);
 
-	ROS_INFO("Ring buffer length is %d",ring_buffer_length_);
+	ROS_INFO("DATA_READER   Ring buffer length is %d",ring_buffer_length_);
 	robot_sub_=node_handle_.subscribe("situation_assessment/robot_pose",1000,
 		&DataReader::robotCallback,this);
 	agents_sub_=node_handle_.subscribe("situation_assessment/agent_poses",1000,
 		&DataReader::agentsCallback,this);
-	objects_sub_=node_handle_.subscribe("situation_assessment/object_poses_",1000,
+	objects_sub_=node_handle_.subscribe("situation_assessment/object_poses",1000,
 		&DataReader::objectsCallback,this);
 	groups_sub_=node_handle_.subscribe("situation_assessment/group_poses",1000,
 		&DataReader::groupsCallback,this);
 
-	ROS_INFO("Waiting for appropriate topics to be published");
+	// locations_client_=node_handle_.serviceClient<situation_assessment_msgs::GetLocations>("situation_assessment/location_poses");
+	// ROS_INFO("DATA_READER Waiting for location poses service");
+	// locations_client_.waitForExistence();
+	// locationsHelper();
+
+	ROS_INFO("DATA_READER Waiting for appropriate topics to be published");
 	
 	ros::Rate r(3);
 	while ((robot_sub_.getNumPublishers()==0   
@@ -22,8 +27,11 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 		    || groups_sub_.getNumPublishers()==0)  && ros::ok()) {
 		r.sleep();
 	}	
+	ROS_INFO("DATA_READER Done and ready");
 
 	robot_pose_.pose.allocate(ring_buffer_length_);
+	robot_pose_.category="agent";
+	robot_pose_.type="robot";
 }
 void DataReader::robotCallback(situation_assessment_msgs::NamedPose msg) {
 	boost::lock_guard<boost::mutex> lock(mutex_robot_poses_);
@@ -32,7 +40,7 @@ void DataReader::robotCallback(situation_assessment_msgs::NamedPose msg) {
 }
 
 
-void DataReader::handleEntityMap(situation_assessment_msgs::NamedPoseList msg, EntityMap* map) {
+void DataReader::handleEntityMap(situation_assessment_msgs::NamedPoseList msg, EntityMap* map, string category) {
 
 	BoolMap present_poses;
 	for (EntityMap::iterator i=map->begin();i!=map->end();i++) {
@@ -45,6 +53,7 @@ void DataReader::handleEntityMap(situation_assessment_msgs::NamedPoseList msg, E
 		(*map)[pose.name].pose.insert(pose.pose);
 		(*map)[pose.name].name=pose.name;
 		(*map)[pose.name].type=pose.type;
+		(*map)[pose.name].category=category;
 		present_poses[pose.name]=true;
 	}
 
@@ -55,16 +64,17 @@ void DataReader::handleEntityMap(situation_assessment_msgs::NamedPoseList msg, E
 	}
 }
 
+
 void DataReader::agentsCallback(situation_assessment_msgs::NamedPoseList msg) {
 	boost::lock_guard<boost::mutex> lock(mutex_agent_poses_);
 
-	handleEntityMap(msg,&agent_poses_map_);
+	handleEntityMap(msg,&agent_poses_map_,"agent");
 
 }
 void DataReader::objectsCallback(situation_assessment_msgs::NamedPoseList msg) {
 	boost::lock_guard<boost::mutex> lock(mutex_object_poses_);
 
-	handleEntityMap(msg,&object_poses_map_);
+	handleEntityMap(msg,&object_poses_map_,"object");
 
 }
 
@@ -98,6 +108,16 @@ void DataReader::groupsCallback(situation_assessment_msgs::GroupList msg) {
 
 }
 
+void DataReader::locationsHelper() {
+	situation_assessment_msgs::GetLocations srv;
+	if (locations_client_.call(srv)) {
+		handleEntityMap(srv.response.locations,&location_poses_map_,"location");
+	}
+	else {
+		ROS_WARN("DATA_READER Couldn't obtain locations");
+	}
+}
+
 
 EntityMap DataReader::getAgentPoses() {
 	boost::lock_guard<boost::mutex> lock(mutex_agent_poses_);
@@ -119,5 +139,9 @@ EntityMap DataReader::getObjectPoses() {
 Entity DataReader::getRobotPoses() {
 	boost::lock_guard<boost::mutex> lock(mutex_robot_poses_);
 	return robot_pose_;
+}
+
+EntityMap DataReader::getLocationPoses() {
+	return location_poses_map_;
 }
 
