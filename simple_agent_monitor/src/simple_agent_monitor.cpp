@@ -304,8 +304,8 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_entities,areas);
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
-			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_plus_locations);
-			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_plus_locations);
+			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities);
+			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities);
 
 			vector<string> area_names;
 			for (PolygonMap::iterator it=areas.begin();it!=areas.end();it++) {

@@ -41,7 +41,7 @@ void TfBridge::getPoses() {
 				new_group_pose.position.z=new_group_pose.position.z+transform.getOrigin().getZ();
 
 			}     catch (tf::TransformException ex){
-				ROS_ERROR("%s",ex.what());
+				// ROS_ERROR("%s",ex.what());
 			}
 		}
 	}
@@ -78,7 +78,7 @@ void TfBridge::getPoses() {
 				object_poses_[object_list_[i]].name=object_list_[i];
 
 			}     catch (tf::TransformException ex){
-				ROS_ERROR("%s",ex.what());
+				// ROS_ERROR("%s",ex.what());
 			}
 		}
 	}
@@ -89,13 +89,13 @@ void TfBridge::getPoses() {
 			if (!ros::ok()) {
 					return;
 				}
-			listener_.lookupTransform("/map","base_link",ros::Time(0),transform);
+			listener_.lookupTransform("map","base_link",ros::Time(0),transform);
 			geometry_msgs::Pose pose=tfToGeometry(transform);
 			robot_pose_.pose=pose;
 			robot_pose_.name=robot_name_;
 			robot_pose_.type="ROBOT";
 		} catch(tf::TransformException ex) {
-			ROS_ERROR("TF_BRIDGE %s",ex.what());
+			ROS_ERROR("TF_BRIDGE  %s",ex.what());
 		}
 	}
 
