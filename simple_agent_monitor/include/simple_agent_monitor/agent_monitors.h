@@ -15,6 +15,7 @@
 #include <string>
 #include <boost/polygon/polygon.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <simple_agent_monitor/entity.h>
 

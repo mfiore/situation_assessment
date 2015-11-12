@@ -33,6 +33,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp> 
 #include <boost/thread/condition_variable.hpp>
+#include <boost/foreach.hpp>
 
 //other
 #include <utility>
@@ -47,7 +48,7 @@ using namespace std;
 namespace gtl = boost::polygon;
 
 //useful typedef
-typedef map<string,RingBuffer<geometry_msgs::Pose>> BufferMap;
+typedef map<string,RingBuffer<geometry_msgs::Pose> > BufferMap;
 typedef map<string,bool> BoolMap;
 typedef map<string,vector<string> > StringVectorMap;
 typedef map<string,Polygon> PolygonMap; 
@@ -86,7 +87,7 @@ bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessm
 		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to monitor. Coordinates:");	
 		Point pts[area.points.size()];
 		int i=0;
-		for (geometry_msgs::Point32 point:area.points) {
+		BOOST_FOREACH(geometry_msgs::Point32 point,area.points) {
 			pts[i]=gtl::construct<Point>(point.x,point.y);
 			ROS_INFO("SIMPLE_AGENT_MONITOR - %f %f",point.x,point.y);
 			i++;
@@ -215,7 +216,7 @@ void updateEntityAreas(EntityMap agent_poses) {
 
 			Point pts[area.points.size()];
 			int i=0;
-			for (geometry_msgs::Point32 point:area.points) {
+			BOOST_FOREACH(geometry_msgs::Point32 point,area.points) {
 				pts[i]=gtl::construct<Point>(point.x,point.y);
 				i++;
 			}

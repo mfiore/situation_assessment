@@ -54,7 +54,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDistances(EntityMap ma
 			if (entity2->first!=entity1->first) {
 				pose2=entity2->second.pose.getSequence(1)[0];
 				double d=calculateDistance(pose1.position,pose2.position);
-				pair<string,string> distanceInput{entity1->first,entity2->first};
+				pair<string,string> distanceInput(entity1->first,entity2->first);
 				if ((*entity_distances)[distanceInput].size==0) {
 					(*entity_distances)[distanceInput].allocate(10);
 				}
@@ -64,7 +64,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDistances(EntityMap ma
 				f.subject=entity1->first;
 				f.predicate.push_back("distance");
 				f.predicate.push_back(entity2->first);
-				f.value.push_back(to_string(d));
+				f.value.push_back(boost::lexical_cast<string>(d));
 				result.push_back(f);
 				// cout<<"Distance "<<entity1->first<<" "<<entity2->first<<" "<<d<<"\n";
 			}
@@ -88,7 +88,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getIsMoving(EntityMap map
 		f.model=robot_name_;
 		f.subject=entity->first;
 		f.predicate.push_back("isMoving");
-		f.value.push_back(to_string(value));
+		f.value.push_back(boost::lexical_cast<string>(value));
 		result.push_back(f);
 
 	}
@@ -106,7 +106,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDeltaDistances(EntityM
 				if (entity2->first!=entity1->first) {
 					pose2=entity2->second.pose.getSequence(1)[0];
 
-					pair<string,string> distanceInput{entity1->first,entity2->first};
+					pair<string,string> distanceInput(entity1->first,entity2->first);
 					vector<double> distances=entity_distances[distanceInput].getSequence(10);
 
 					double delta_distance=distances[9]-distances[0];
@@ -115,7 +115,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDeltaDistances(EntityM
 					f.subject=entity1->first;
 					f.predicate.push_back("delta_distance");
 					f.predicate.push_back(entity2->first);
-					f.value.push_back(to_string(delta_distance));
+					f.value.push_back(boost::lexical_cast<string>(delta_distance));
 					result.push_back(f);
 				}
 			}
@@ -204,13 +204,13 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityPoses(EntityMap 
 		new_fact.subject=it->second.name;
 		new_fact.predicate.push_back("pose");
 		geometry_msgs::Pose pose=it->second.pose.getSequence(1)[0];
-		new_fact.value.push_back(to_string(pose.position.x));
-		new_fact.value.push_back(to_string(pose.position.y));
-		new_fact.value.push_back(to_string(pose.position.z));
-		new_fact.value.push_back(to_string(pose.orientation.x));
-		new_fact.value.push_back(to_string(pose.orientation.y));
-		new_fact.value.push_back(to_string(pose.orientation.z));
-		new_fact.value.push_back(to_string(pose.orientation.w));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.position.x));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.position.y));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.position.z));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.orientation.x));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.orientation.y));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.orientation.z));
+		new_fact.value.push_back(boost::lexical_cast<string>(pose.orientation.w));
 
 		result.push_back(new_fact);
 	}

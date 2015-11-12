@@ -10,12 +10,12 @@ situation_assessment:
     use_orientation: false
     tf_bridge:
         track_robot: true
-        track_agents: false
+        track_agents: true
         track_objects: false
         track_groups: false
     spencer_bridge:
         track_robot: false
-        track_agents: true
+        track_agents: false
         track_objects: true
         track_groups: true
     human_names:
