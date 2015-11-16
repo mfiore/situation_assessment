@@ -70,6 +70,7 @@ bool switch_orientation;
 
 bool switchOrientation(situation_assessment_msgs::SwitchOrientation::Request &req, situation_assessment_msgs::SwitchOrientation::Response &res) {
 	switch_orientation=req.backward;
+	return true;
 }
 
 
