@@ -13,10 +13,10 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	groups_sub_=node_handle_.subscribe("situation_assessment/group_poses",1000,
 		&DataReader::groupsCallback,this);
 
-	// locations_client_=node_handle_.serviceClient<situation_assessment_msgs::GetLocations>("situation_assessment/location_poses");
-	// ROS_INFO("DATA_READER Waiting for location poses service");
-	// locations_client_.waitForExistence();
-	// locationsHelper();
+	locations_client_=node_handle_.serviceClient<situation_assessment_msgs::GetLocations>("situation_assessment/get_locations");
+	ROS_INFO("DATA_READER Waiting for location service");
+	locations_client_.waitForExistence();
+	locationsHelper();
 
 	ROS_INFO("DATA_READER Waiting for appropriate topics to be published");
 	
@@ -111,11 +111,29 @@ void DataReader::groupsCallback(situation_assessment_msgs::GroupList msg) {
 void DataReader::locationsHelper() {
 	situation_assessment_msgs::GetLocations srv;
 	if (locations_client_.call(srv)) {
-		handleEntityMap(srv.response.locations,&location_poses_map_,"location");
+		situation_assessment_msgs::NamedPoseList named_pose_list;
+		for (int i=0; i<srv.response.locations.size();i++) {
+			situation_assessment_msgs::NamedPose named_pose;
+			named_pose.name=srv.response.locations[i];
+			named_pose.type="location";
+			named_pose.pose.position.x=srv.response.centers[i].x;
+			named_pose.pose.position.y=srv.response.centers[i].y;
+			named_pose.pose.position.z=srv.response.centers[i].z;
+			named_pose.pose.orientation.w=1;
+			named_pose_list.poses.push_back(named_pose);
+		
+			location_areas_[named_pose.name]=srv.response.areas[i];
+		}
+
+		handleEntityMap(named_pose_list,&location_poses_map_,"location");
 	}
 	else {
 		ROS_WARN("DATA_READER Couldn't obtain locations");
 	}
+}
+
+GeometryPolygonMap DataReader::getLocationsAreas() {
+	return location_areas_;
 }
 
 

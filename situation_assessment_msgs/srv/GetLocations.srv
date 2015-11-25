@@ -1,2 +1,4 @@
 ---
-NamedPoseList locations
+string[] locations
+geometry_msgs/Point[] centers
+geometry_msgs/Polygon[] areas

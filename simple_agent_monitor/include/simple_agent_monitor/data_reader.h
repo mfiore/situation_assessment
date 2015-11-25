@@ -18,6 +18,8 @@
 
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Point32.h>
+#include <geometry_msgs/Polygon.h>
+
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -33,6 +35,7 @@
 typedef map<string,Entity> EntityMap;
 typedef map<string,bool> BoolMap;
 typedef map<string,vector<string> > StringVectorMap;
+typedef map<string,geometry_msgs::Polygon> GeometryPolygonMap;
 
 
 using namespace std;
@@ -46,6 +49,7 @@ public:
 	EntityMap getObjectPoses();
 	Entity getRobotPoses();
 	EntityMap getLocationPoses();
+	GeometryPolygonMap getLocationsAreas();
 
 private:
 	void robotCallback(situation_assessment_msgs::NamedPose msg);
@@ -69,6 +73,8 @@ private:
 	Entity robot_pose_;
 
 	StringVectorMap agent_groups_map_;
+
+	GeometryPolygonMap location_areas_;
 
 	int ring_buffer_length_;
 

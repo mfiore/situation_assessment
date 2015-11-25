@@ -74,6 +74,22 @@ bool switchOrientation(situation_assessment_msgs::SwitchOrientation::Request &re
 }
 
 
+void addAreaHelper(string name, geometry_msgs::Polygon area) {
+	ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to monitor. Coordinates:");	
+	Point pts[area.points.size()];
+	int i=0;
+	BOOST_FOREACH(geometry_msgs::Point32 point,area.points) {
+		pts[i]=gtl::construct<Point>(point.x,point.y);
+		ROS_INFO("SIMPLE_AGENT_MONITOR - %f %f",point.x,point.y);
+		i++;
+	}
+	Polygon poly;
+	gtl::set_points(poly, pts, pts+i);
+
+	areas[name]=poly;
+	msg_areas_map[name]=area;
+}
+
 //service to add a geometrical area in the environment
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
@@ -83,21 +99,7 @@ bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessm
 		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to entity %s",req.linked_to_entity.c_str());
 	}
 	else {
-		geometry_msgs::Polygon area=req.area;
-
-		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to monitor. Coordinates:");	
-		Point pts[area.points.size()];
-		int i=0;
-		BOOST_FOREACH(geometry_msgs::Point32 point,area.points) {
-			pts[i]=gtl::construct<Point>(point.x,point.y);
-			ROS_INFO("SIMPLE_AGENT_MONITOR - %f %f",point.x,point.y);
-			i++;
-		}
-		Polygon poly;
-		gtl::set_points(poly, pts, pts+i);
-
-		areas[req.name]=poly;
-		msg_areas_map[req.name]=req.area;
+		addAreaHelper(req.name, req.area);
 	}
 
 	res.result=true;
@@ -280,6 +282,14 @@ int main(int argc, char** argv) {
 
 	vector<situation_assessment_msgs::Fact> old_fact_list;
 
+
+	EntityMap location_poses=data_reader.getLocationPoses();
+	GeometryPolygonMap location_areas=data_reader.getLocationsAreas();
+	for (GeometryPolygonMap::iterator i=location_areas.begin();i!=location_areas.end();i++) {
+		addAreaHelper(i->first,i->second);
+	}
+
+	ros::Duration(2).sleep();
 	while (ros::ok()) {
 		ros::spinOnce();
 
@@ -298,6 +308,10 @@ int main(int argc, char** argv) {
 			if (object_poses.size()>0) {
 				all_entities.insert(object_poses.begin(),object_poses.end());
 			}	
+			EntityMap all_entities_plus_locations=all_entities;
+			if (location_poses.size()>0) {
+				all_entities_plus_locations.insert(location_poses.begin(),location_poses.end());
+			}
 			updateEntityAreas(all_agents); //update areas linked to entities
 
 			//get facts
@@ -306,8 +320,8 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_entities,areas);
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
-			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities);
-			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities);
+			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities_plus_locations);
+			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities_plus_locations);
 
 			vector<string> area_names;
 			for (PolygonMap::iterator it=areas.begin();it!=areas.end();it++) {
