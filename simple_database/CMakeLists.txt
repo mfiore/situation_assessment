@@ -20,7 +20,7 @@ project(simple_database)
 find_package(catkin REQUIRED COMPONENTS roscpp rospy situation_assessment_msgs message_runtime)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system thread)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -99,7 +99,8 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
- include_directories(include ${catkin_INCLUDE_DIRS} )
+ include_directories(include ${catkin_INCLUDE_DIRS} 
+ ${boost_INCLUDE_DIRS})
 
 ## Declare a cpp library
  add_library(Database
@@ -125,6 +126,7 @@ add_library(DatabaseElement
 ## Specify libraries to link a library or executable target against
  target_link_libraries(simple_database
    ${catkin_LIBRARIES}
+   ${boost_LIBRARIES}
    Database
    DatabaseElement
  )
