@@ -42,12 +42,6 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
     for (int i=0;i<req.query.value.size();i++) {
         value_string=value_string+req.query.value[i]+" ";
     }
-
-    ROS_INFO("value size %ld",req.query.value.size());
-
-    vector<string> predicate_try;
-    predicate_try.push_back("type");
-
 	ROS_INFO("SIMPLE_DATABASE Received query %s %s %s %s ",req.query.model.c_str(), req.query.subject.c_str(),
 			predicate_string.c_str(),  value_string.c_str() );
 	DatabaseElement element(req.query.model, req.query.subject, req.query.predicate, req.query.value);
@@ -72,7 +66,6 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
             res_value_string=res_value_string+f.value[i];
         }
 
-
         ROS_INFO("SIMPLE_DATABASE %s %s %s ",f.model.c_str(), f.subject.c_str()
         		,res_predicate_string.c_str(), res_value_string.c_str() );
     }
@@ -82,58 +75,32 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
 }
 
 
-// void simpleAgentMonitorCallback(const situation_assessment_msgs::FactList::ConstPtr& msg) {
-//     vector<situation_assessment_msgs::Fact> v_fact=msg->fact_list;
-// 	for (auto f:v_fact) {
-// 		DatabaseElement element(robot_name,f.subject,f.predicate,f.value);
-//         vector<DatabaseElement> found_elements=database.getElements(element);
 
-//         if (found_elements.size()==0) {
-//             if (f.predicate[0]=="isMoving") {
-//                 cout<<"an isMoving noDuplicate\n";
-//             }
-//             DatabaseElement element2(robot_name,f.subject,f.predicate,"");
-//             vector<DatabaseElement> found_elements2=database.getElements(element);
-//             if (found_elements2.size()!=0) {
-//                 cout<<"found element with "<<found_elements2[0].value_<<"\n";
-//                 database.removeElement(found_elements2[0]);
-//             }
-
-//         database.addElement(element);
-
-//         }
-//         else {
-//             cout<<found_elements[0].value_<<"\n";
-//             cout<<"Duplicate\n";
-//         }
-//     }
-
-// }
 
 bool addFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
-    // ROS_INFO("SIMPLE_DATABASE Received request to add facts:");
+    ROS_INFO("SIMPLE_DATABASE Received request to add facts:");
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
         // ROS_INFO("SIMPLE_DATABASE %s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str());
         // ROS_INFO("SIMPLE_DATABASE %s",fact.value[0].c_str());
-        DatabaseElement element(fact.model.c_str(),fact.subject,fact.predicate,fact.value);
+        DatabaseElement element(fact.model,fact.subject,fact.predicate,fact.value);
 
         vector<DatabaseElement> found_elements=database.getElements(element);
         if (found_elements.size()==0) {
          database.addElement(element);
         }
     }
-    // ROS_INFO("SIMPLE_DATABASE Finishing with adding facts");
+    ROS_INFO("SIMPLE_DATABASE Finishing with adding facts");
     return true;
 }
 
 bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
-    // ROS_INFO("SIMPLE_DATABASE Received request to remove facts");
+    ROS_INFO("SIMPLE_DATABASE Received request to remove facts");
     // ROS_INFO("SIMPLE_DATABASE Database size before remove is %ld",database.database_.size());
     for (situation_assessment_msgs::Fact fact:req.fact_list) {
         // ROS_INFO("SIMPLE_DATABASE Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value[0].c_str());
-        DatabaseElement element(robot_name,fact.subject,fact.predicate,fact.value);
+        DatabaseElement element(fact.model,fact.subject,fact.predicate,fact.value);
         database.removeElement(element);
     }
     // ROS_INFO("SIMPLE_DATABASE Database size after remove is %ld",database.database_.size());
@@ -184,11 +151,6 @@ int main(int argc, char **argv) {
     ROS_INFO("SIMPLE_DATABASE Advertising services");
     world_status_publisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/world_status",1000);
 
-    // Server action_server(n, "situation_assessment/monitor_facts", 
-    // boost::bind(&monitorFacts,&action_server), false);
-    // ROS_INFO("SIMPLE_DATABASE Ready to monitor facts");
-
-    // ros::Subscriber sub = node_handle.subscribe("/situation_assessment/agentFactList", 1000, simpleAgentMonitorCallback);
 
 
     ROS_INFO("SIMPLE_DATABASE Started database");

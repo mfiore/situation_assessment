@@ -17,6 +17,9 @@
 #include <iostream>
 #include "ros/ros.h"
 
+#include <boost/thread/locks.hpp> 
+#include <boost/thread/lock_guard.hpp> 
+#include <boost/thread/mutex.hpp>
 
 using namespace std;
 
@@ -35,6 +38,7 @@ public:
 
 private:
 
+	boost::mutex db_mutex_;
 
 
 };

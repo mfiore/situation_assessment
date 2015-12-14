@@ -17,11 +17,15 @@ Database::~Database() {
 }
 
 void Database::addElement(DatabaseElement element) {
+    boost::lock_guard<boost::mutex> lock(db_mutex_); 
     database_.push_back(element);
 
 }
 
 vector<DatabaseElement> Database::getElements(DatabaseElement element) {
+    boost::lock_guard<boost::mutex> lock(db_mutex_); 
+
+
     vector<DatabaseElement> result;
     for (int i = 0; i < database_.size(); i++) {
         bool good = element.compare(database_[i]);
@@ -34,6 +38,8 @@ vector<DatabaseElement> Database::getElements(DatabaseElement element) {
 }
 
 void Database::removeElement(DatabaseElement element) {
+    boost::lock_guard<boost::mutex> lock(db_mutex_); 
+
     vector<DatabaseElement> newDatabase;
     for (int i = 0; i < database_.size(); i++) {
         bool found=element.compare(database_[i]);

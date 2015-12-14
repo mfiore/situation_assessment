@@ -121,7 +121,12 @@ bool compareFacts(situation_assessment_msgs::Fact f1, situation_assessment_msgs:
 	for (int i=0; i<f1.predicate.size();i++) {
 		if (f1.predicate[i]!=f2.predicate[i]) return false; 
 	}
-	return f1.subject==f2.subject && f1.model==f2.model && f1.value==f2.value;
+	if (f1.value.size()!=f2.value.size()) return false;
+	for (int i=0; i<f1.value.size();i++) {
+		if (f1.value[i]!=f2.value[i]) return false;
+	}
+
+	return f1.subject==f2.subject && f1.model==f2.model;
 }
 //finds a fact in the list
 int findFact(situation_assessment_msgs::Fact f, vector<situation_assessment_msgs::Fact> list) {
