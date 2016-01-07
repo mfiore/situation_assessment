@@ -69,6 +69,8 @@ find_package(catkin REQUIRED roscpp rospy message_generation std_msgs message_ru
    GetLocations.srv
    EmptyRequest.srv
    SwitchOrientation.srv
+   PlaceObject.srv
+   PutObjectInHand.srv
  )
 
 
