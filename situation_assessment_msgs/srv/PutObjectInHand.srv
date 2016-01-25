@@ -1,0 +1,5 @@
+string object
+string agent
+bool has_object
+---
+bool result
