@@ -48,7 +48,8 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
 	vector<DatabaseElement> result = database.getElements(element);
 	vector<situation_assessment_msgs::Fact> return_facts;
 	ROS_INFO("SIMPLE_DATABASE Return %ld elements",result.size());
-	for (DatabaseElement el : result) {
+	for (int i=0; i<result.size();i++) {
+        DatabaseElement el=result[i];
         situation_assessment_msgs::Fact f;
         f.model = el.model_;
         f.subject = el.subject_;
@@ -80,7 +81,8 @@ bool query(situation_assessment_msgs::QueryDatabase::Request &req,
 bool addFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
     ROS_INFO("SIMPLE_DATABASE Received request to add facts:");
-    for (situation_assessment_msgs::Fact fact:req.fact_list) {
+    for (int i=0; i<req.fact_list.size();i++) {
+        situation_assessment_msgs::Fact fact=req.fact_list[i];
         // ROS_INFO("SIMPLE_DATABASE %s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str());
         // ROS_INFO("SIMPLE_DATABASE %s",fact.value[0].c_str());
         DatabaseElement element(fact.model,fact.subject,fact.predicate,fact.value);
@@ -98,7 +100,8 @@ bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
         situation_assessment_msgs::DatabaseRequest::Response &res) {
     ROS_INFO("SIMPLE_DATABASE Received request to remove facts");
     // ROS_INFO("SIMPLE_DATABASE Database size before remove is %ld",database.database_.size());
-    for (situation_assessment_msgs::Fact fact:req.fact_list) {
+    for (int i=0; i<req.fact_list.size();i++) {
+        situation_assessment_msgs::Fact fact=req.fact_list[i];
         // ROS_INFO("SIMPLE_DATABASE Remove %s %s %s %s",robot_name.c_str(),fact.subject.c_str(),fact.predicate[0].c_str(),fact.value[0].c_str());
         DatabaseElement element(fact.model,fact.subject,fact.predicate,fact.value);
         database.removeElement(element);
@@ -120,7 +123,8 @@ void publishWorldStatus() {
 
         vector<DatabaseElement> elements=database.getElements(empty_element);
 
-        for (DatabaseElement db_element:elements) {
+        for (int i=0; i<elements.size();i++) {
+            DatabaseElement db_element=elements[i];
             situation_assessment_msgs::Fact fact;
             fact.model=db_element.model_;
             fact.subject=db_element.subject_;
