@@ -35,6 +35,9 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 }
 void DataReader::robotCallback(situation_assessment_msgs::NamedPose msg) {
 	boost::lock_guard<boost::mutex> lock(mutex_robot_poses_);
+
+	robot_pose_.name=msg.name;
+	robot_pose_.type=msg.type;
 	robot_pose_.pose.insert(msg.pose);
 
 }
