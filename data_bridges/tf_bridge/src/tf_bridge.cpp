@@ -35,7 +35,7 @@ void TfBridge::getPoses() {
 				geometry_msgs::Pose pose=tfToGeometry(transform);
 				agent_poses_[agent_name].pose=pose;
 				agent_poses_[agent_name].name=agent_name;
-				agent_poses_[agent_name].type="HUMAN";
+				agent_poses_[agent_name].type="human";
 				new_group_pose.position.x=new_group_pose.position.x+transform.getOrigin().getX();
 				new_group_pose.position.y=new_group_pose.position.y+transform.getOrigin().getY();
 				new_group_pose.position.z=new_group_pose.position.z+transform.getOrigin().getZ();
@@ -51,13 +51,13 @@ void TfBridge::getPoses() {
 		new_group_pose.position.z=new_group_pose.position.z/agent_list_.size();
 		group_poses_["GROUP_1"].pose=new_group_pose;
 		group_poses_["GROUP_1"].name="GROUP_1";
-		group_poses_["GROUP_1"].type="GROUP";
+		group_poses_["GROUP_1"].type="group";
 		agent_groups_["GROUP_1"]=agent_list_;
 
 		BOOST_FOREACH(string agent, agent_list_) {
 			group_poses_[agent].pose=agent_poses_[agent].pose;
 			group_poses_[agent].name=agent;
-			group_poses_[agent].type="SELF_GROUP";
+			group_poses_[agent].type="self_group";
 			vector<string> self_members;
 			self_members.push_back(agent);
 			agent_groups_[agent]=self_members;
@@ -93,7 +93,7 @@ void TfBridge::getPoses() {
 			geometry_msgs::Pose pose=tfToGeometry(transform);
 			robot_pose_.pose=pose;
 			robot_pose_.name=robot_name_;
-			robot_pose_.type="ROBOT";
+			robot_pose_.type="robot";
 		} catch(tf::TransformException ex) {
 			ROS_ERROR("TF_BRIDGE  %s",ex.what());
 		}
