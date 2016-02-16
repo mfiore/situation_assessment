@@ -318,7 +318,6 @@ int main(int argc, char** argv) {
 				all_entities_plus_locations.insert(location_poses.begin(),location_poses.end());
 			}
 			updateEntityAreas(all_agents); //update areas linked to entities
-
 			//get facts
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
