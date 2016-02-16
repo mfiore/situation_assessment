@@ -1,5 +1,5 @@
----
 situation_assessment:
+<<<<<<< Updated upstream
     #doc_path: /home/pc2/ros-workspace/src/spencer_soft/mapping/annotated_mapping/maps/schiphol_small_area/
     #doc_name: schipol_small_area
     #doc_path: /home/pc2/ros-workspace/src/spencer_soft/mapping/annotated_mapping/maps/gotoC4/
@@ -18,16 +18,28 @@ situation_assessment:
         track_robot: true
         track_agents: true
         track_objects: false
-        track_groups: true
+        track_groups: false
     spencer_bridge:
+        track_robot: false
+        track_agents: false
+        track_objects: true
+        track_groups: true
+=======
+    ring_buffer_length: 10
+    use_orientation: false
+    tf_bridge:
         track_robot: false
         track_agents: false
         track_objects: false
         track_groups: false
         track_groups: false
+>>>>>>> Stashed changes
     human_names:
         - HERAKLES_HUMAN1
         - HERAKLES_HUMAN2
+<<<<<<< Updated upstream
+=======
         #object_names: 
     simulation: true
     robot_name: PR2_ROBOT
+>>>>>>> Stashed changes
