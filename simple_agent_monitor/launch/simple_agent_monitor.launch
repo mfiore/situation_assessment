@@ -1,0 +1,9 @@
+<launch>
+  <rosparam command="load" file="$(find situation_assessment_parameters)/situation_assessment_config.yaml" />
+  <include file="$(find maps)/map.launch" />
+  <node name="tf_bridge" pkg="tf_bridge" type="tf_bridge" output="screen" />
+  <node name="simple_agent_monitor" pkg="simple_agent_monitor" type="simple_agent_monitor" output="screen" />
+  <node name="simple_database" pkg="simple_database" type="simple_database"  />
+
+
+</launch>

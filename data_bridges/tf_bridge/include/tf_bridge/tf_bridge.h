@@ -13,6 +13,7 @@
 #include <situation_assessment_msgs/NamedPose.h>
 #include <situation_assessment_msgs/Group.h>
 #include <situation_assessment_msgs/GroupList.h>
+#include <situation_assessment_msgs/QueryDatabase.h>
 
 #include <geometry_msgs/Pose.h>
 
@@ -27,6 +28,7 @@ private:
 	geometry_msgs::Pose tfToGeometry(tf::StampedTransform transform);
 
 	tf::TransformListener listener_;
+
 
 };
 

@@ -64,7 +64,7 @@ void TfBridge::getPoses() {
 		}
 	}
 	if (track_objects_) {
-		for (int i=0; object_list_.size(); i++) {
+		for (int i=0; i<object_list_.size(); i++) {
 			try {
 				tf::StampedTransform transform;
 				listener_.waitForTransform("map", object_list_[i], ros::Time(0), ros::Duration(1.0) );
@@ -76,11 +76,11 @@ void TfBridge::getPoses() {
 				geometry_msgs::Pose pose=tfToGeometry(transform);
 				object_poses_[object_list_[i]].pose=pose;
 				object_poses_[object_list_[i]].name=object_list_[i];
-
 			}     catch (tf::TransformException ex){
 				// ROS_ERROR("%s",ex.what());
 			}
 		}
+
 	}
 	if (track_robot_) {
 		try {

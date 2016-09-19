@@ -250,7 +250,7 @@ int main(int argc, char** argv) {
 
 	ros::NodeHandle node_handle;
 
-	node_handle.getParam("/robot/name",robotName);
+	node_handle.getParam("/situation_assessment/robot_name",robotName);
 	ROS_INFO("SIMPLE_AGENT_MONITOR Init simple_agent_monitor");
 	ROS_INFO("SIMPLE_AGENT_MONITOR Robot name is %s",robotName.c_str());
 
@@ -294,10 +294,12 @@ int main(int argc, char** argv) {
 		addAreaHelper(i->first,i->second);
 	}
 
+	ROS_INFO("SIMPLE_AGENT_MONITOR got areas");
 	ros::Duration(2).sleep();
 	while (ros::ok()) {
 		ros::spinOnce();
 
+		// ROS_INFO("SIMPLE_AGENT_MONITOR spinning");
 		//gets entities data
 		EntityMap agent_poses=data_reader.getAgentPoses();
 		Entity robot_poses=data_reader.getRobotPoses();
@@ -305,6 +307,8 @@ int main(int argc, char** argv) {
 		EntityMap group_poses=data_reader.getGroupPoses();
 		StringVectorMap group_members=data_reader.getAgentGroups();
 
+
+		// ROS_INFO("SIMPLE_AGENT_MONITOR got all poses");
 		// if (agent_poses.size()>0) {
 			//create some containers with only humans, human and robot, or human robot and objects.
 			EntityMap all_agents=agent_poses;

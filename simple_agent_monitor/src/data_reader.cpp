@@ -13,10 +13,10 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	groups_sub_=node_handle_.subscribe("situation_assessment/group_poses",1000,
 		&DataReader::groupsCallback,this);
 
-	locations_client_=node_handle_.serviceClient<situation_assessment_msgs::GetLocations>("situation_assessment/get_locations");
-	ROS_INFO("DATA_READER Waiting for location service");
-	locations_client_.waitForExistence();
-	locationsHelper();
+	// locations_client_=node_handle_.serviceClient<situation_assessment_msgs::GetLocations>("situation_assessment/get_locations");
+	// ROS_INFO("DATA_READER Waiting for location service");
+	// locations_client_.waitForExistence();
+	// locationsHelper();
 
 	ROS_INFO("DATA_READER Waiting for appropriate topics to be published");
 	

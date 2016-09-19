@@ -1,33 +1,29 @@
 ---
 situation_assessment:
-    #doc_path: /home/pc2/ros-workspace/src/spencer_soft/mapping/annotated_mapping/maps/schiphol_small_area/
-    #doc_name: schipol_small_area
-    #doc_path: /home/pc2/ros-workspace/src/spencer_soft/mapping/annotated_mapping/maps/gotoC4/
-    #doc_name: gotoC4
-    #doc_path: /home/pc2/ros-workspace/src/spencer_soft/mapping/annotated_mapping/maps/opendoorsday_alufr/
-    #doc_name: opendoorsday_alufr
-    doc_path: /home/mfiore/ros_workspaces/my_spencer_ws/src/spencer_situation_assessment/spencer_symbolic_map/maps/map_alu_fr2/
-    doc_name: map_alu_fr2
-    information_screen_area_b: 2
-    information_screen_area_h: 3
-    gate_area_b: 3
-    gate_area_h: 5
     ring_buffer_length: 10
     use_orientation: false
     tf_bridge:
         track_robot: true
         track_agents: true
-        track_objects: false
+        track_objects: true
         track_groups: true
-    spencer_bridge:
-        track_robot: false
-        track_agents: false
-        track_objects: false
-        track_groups: false
-        track_groups: false
     human_names:
         - HERAKLES_HUMAN1
-        - HERAKLES_HUMAN2
-        #object_names: 
+        # - HERAKLES_HUMAN2
+    object_names:
+        - bottle 
     simulation: true
     robot_name: PR2_ROBOT
+
+    action_monitoring:
+        use_database: false
+        trigger_distance: 0.5
+        actions_to_monitor:
+          - pick    
+        actions_details:
+            pick:
+                target: main_object
+                monitor_part: hand
+        affordances:
+            bottle:
+                - pick
