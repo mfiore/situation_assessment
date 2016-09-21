@@ -111,6 +111,27 @@ bool removeFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
     return true;
 
 }
+bool setFacts(situation_assessment_msgs::DatabaseRequest::Request &req,
+        situation_assessment_msgs::DatabaseRequest::Response &res) {
+    ROS_INFO("SIMPLE_DATABASE Received request to set facts");
+
+   
+    for (int i=0; i<req.fact_list.size();i++) {
+        situation_assessment_msgs::Fact fact=req.fact_list[i];
+        // ROS_INFO("SIMPLE_DATABASE %s %s %s %s",fact.model.c_str(),fact.subject.c_str(),fact.predicate[0].c_str());
+        // ROS_INFO("SIMPLE_DATABASE %s",fact.value[0].c_str());
+
+        DatabaseElement remove_element(fact.model,fact.subject,fact.predicate,vector<string>());
+        vector<DatabaseElement> found_elements=database.getElements(remove_element);
+        for (int i=0; i<found_elements.size();i++) {
+            database.removeElement(found_elements[i]);
+        }
+
+        DatabaseElement add_element(fact.model,fact.subject,fact.predicate,fact.value);
+        database.addElement(add_element);
+    }
+    return true;
+}
 
 
 void publishWorldStatus() {
@@ -149,6 +170,7 @@ int main(int argc, char **argv) {
     ROS_INFO("SIMPLE_DATABASE Init simple_database");
 
     ros::ServiceServer service_add = node_handle.advertiseService("situation_assessment/add_facts", addFacts);
+    ros::ServiceServer service_set = node_handle.advertiseService("situation_assessment/set_facts", setFacts);
     ros::ServiceServer service_remove = node_handle.advertiseService("situation_assessment/remove_facts", removeFacts);
     ros::ServiceServer service_query = node_handle.advertiseService("situation_assessment/query_database", query);
 

@@ -8,39 +8,18 @@ situation_assessment:
         track_objects: true
         track_groups: true
     human_names:
-        - HERAKLES_HUMAN1
+        - human1
         # - HERAKLES_HUMAN2
     object_names:
-        - bottle 
+        - waterbottle
+        - teabottle
+        - mug
+        - table
+        - shelf1
+        - shelf2
+        - shelf3
+        - sidetable
+        - sofa
     simulation: true
     robot_name: PR2_ROBOT
 
-    action_monitoring:
-        use_database: false
-        trigger_distance: 0.5
-        actions_to_monitor:
-          - pick    
-        actions_details:
-            pick:
-                target: main_object
-                monitor_part: hand
-        affordances:
-            bottle:
-                - pick
-    intention_recognition:
-        intention_list:
-            - drink_water
-            # - drink_tea
-        intention_details:
-            drink_water:
-                mdp_path: /home/mfiore/ros_workspaces/indigo_ws/src/scenarios/demo_observer/mdp_models/drink_water
-                linked_contexts:
-                    - hot_day
-                context_probabilities:
-                    hot_day: 0.7
-            # drink_tea:
-            #     mdp_path: home/mfiore/ros_workspaces/indigo_ws/src/scenarios/demo_observer/mdp_models/drink_tea
-            #     linked_contexts:
-            #         - cold_day
-            #     context_probabilities:
-            #         cold_day: 0.7
