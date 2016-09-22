@@ -21,6 +21,7 @@
 #include "situation_assessment_msgs/Fact.h"
 #include "situation_assessment_msgs/FactList.h"
 #include "situation_assessment_msgs/DatabaseRequest.h"
+ #include "tinyxml2/tinyxml2.h"
 
 using namespace std;
 
@@ -29,6 +30,23 @@ Database database;
 ros::Publisher world_status_publisher;
 
 string robot_name;
+
+//Two utilities functions to split a stirng
+std::vector<std::string> & stringSplitElems(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> stringSplit(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    stringSplitElems(s, delim, elems);
+    return elems;
+}
+
 
 bool query(situation_assessment_msgs::QueryDatabase::Request &req,
         situation_assessment_msgs::QueryDatabase::Response &res) {
@@ -161,6 +179,40 @@ void publishWorldStatus() {
     }
 }
 
+void getStartingState(ros::NodeHandle *node_handle) {
+    string path;
+    node_handle->getParam("/situation_assessment/starting_world_state_file",path);
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLError file_error=doc.LoadFile(path.c_str());
+    ROS_INFO("SIMPLE_DATABASE - initial world state is: ");
+
+    if (file_error==tinyxml2::XML_SUCCESS) {
+        tinyxml2::XMLElement* element=doc.FirstChildElement()->FirstChildElement();
+        while (element!=NULL) {
+            const char* model=element->Attribute("model");
+            const char* subject=element->Attribute("subject");
+            const char* predicate=element->Attribute("predicate");
+            const char* value=element->Attribute("value");
+
+            string predicate_s=predicate;
+            string value_s=value;
+
+            vector<string> predicate_v=stringSplit(predicate_s,' ');
+            vector<string> value_v=stringSplit(value_s,' ');
+
+            ROS_INFO("- %s %s %s %s",model,subject,predicate,value);
+            DatabaseElement db_element(model,subject,predicate_v,value_v);
+            database.addElement(db_element);
+
+            element=element->NextSiblingElement();
+        }
+    }
+    else {
+        ROS_INFO("SIMPLE_DATABASE - no initial facts");
+    }
+
+}
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "simple_database");
     ros::NodeHandle node_handle;
@@ -173,6 +225,8 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_set = node_handle.advertiseService("situation_assessment/set_facts", setFacts);
     ros::ServiceServer service_remove = node_handle.advertiseService("situation_assessment/remove_facts", removeFacts);
     ros::ServiceServer service_query = node_handle.advertiseService("situation_assessment/query_database", query);
+
+    getStartingState(&node_handle);
 
     ROS_INFO("SIMPLE_DATABASE Advertising services");
     world_status_publisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/world_status",1000);

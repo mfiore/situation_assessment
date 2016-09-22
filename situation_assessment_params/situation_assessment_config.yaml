@@ -1,5 +1,6 @@
 ---
 situation_assessment:
+    starting_world_state_file: /home/mfiore/ros_workspaces/indigo_ws/src/scenarios/demo_observer/world_state.xml
     ring_buffer_length: 10
     use_orientation: false
     tf_bridge:

@@ -6,7 +6,8 @@ project(simple_database)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy situation_assessment_msgs message_runtime)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy situation_assessment_msgs message_runtime
+tinyxml2)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system thread)
