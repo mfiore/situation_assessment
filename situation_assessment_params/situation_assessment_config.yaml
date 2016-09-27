@@ -1,6 +1,6 @@
 ---
 situation_assessment:
-    starting_world_state_file: /home/theworld/ros_workspaces/indigo_ws/src/scenarios/demo_observer/world_state.xml
+    starting_world_state_file: /home/mfiore/ros_workspaces/indigo_ws/src/scenarios/demo_observer/world_state.xml
     ring_buffer_length: 10
     use_orientation: false
     tf_bridge:
@@ -28,14 +28,16 @@ situation_assessment:
         - shelf1
         - shelf2
         - shelf3
+        - this
     locations_depth:
-        - livingroom: 1
-        - outside: 1
-        - bathroom: 1
-        - table: 2
-        - shelf1: 2
-        - shelf2: 2
-        - shelf3: 2
+        livingroom: 1
+        outside: 1
+        bathroom: 1
+        table: 2
+        shelf1: 2
+        shelf2: 2
+        shelf3: 2
+        this: 0
     simulation: true
     robot_name: PR2_ROBOT
 
