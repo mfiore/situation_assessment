@@ -55,6 +55,8 @@ public:
     vector<situation_assessment_msgs::Fact> getIsInArea(EntityMap map, PolygonMap areas);  //which agents are present in areas
     vector<situation_assessment_msgs::Fact> getHasArea(vector<string> areas);  //which agents are present in areas
     vector<situation_assessment_msgs::Fact> getEntityPoses(EntityMap map);
+    std::vector<situation_assessment_msgs::Fact> getAt(
+        std::map<std::string,int> depth_areas, std::vector<situation_assessment_msgs::Fact> is_in_area_facts);
 
 
     // vector<situation_assessment_msgs::Fact> getObjectTypes(EntityMap map); //types of objects

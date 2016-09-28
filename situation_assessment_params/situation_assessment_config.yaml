@@ -21,6 +21,9 @@ situation_assessment:
         - shelf3
         - sidetable
         - sofa
+        - livingroom
+        - bathroom
+        - outside
     locations:
         - livingroom
         - outside
@@ -28,7 +31,10 @@ situation_assessment:
         - shelf1
         - shelf2
         - shelf3
+        - sofa
+        - sidetable
         - this
+        - bathroom
     locations_depth:
         livingroom: 1
         outside: 1
@@ -37,6 +43,8 @@ situation_assessment:
         shelf1: 2
         shelf2: 2
         shelf3: 2
+        sofa: 2
+        sidetable: 2
         this: 0
     simulation: true
     robot_name: PR2_ROBOT

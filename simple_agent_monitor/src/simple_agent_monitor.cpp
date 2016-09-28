@@ -254,6 +254,17 @@ int main(int argc, char** argv) {
 	ROS_INFO("SIMPLE_AGENT_MONITOR Init simple_agent_monitor");
 	ROS_INFO("SIMPLE_AGENT_MONITOR Robot name is %s",robotName.c_str());
 
+	std::vector<std::string> locations;
+	std::map<std::string,int> depth_areas;
+	node_handle.getParam("/situation_assessment/locations",locations);
+	ROS_INFO("SIMPLE_AGENT_MONITOR - Location list");
+	for (std::string l:locations){
+		int depth;
+		node_handle.getParam("/situation_assessment/locations_depth/"+l,depth);
+		depth_areas[l]=depth;
+		ROS_INFO("SIMPLE_AGENT_MONITOR - location %s depth %d",l.c_str(),depth);
+	}
+
 
 	ros::Publisher factPublisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/agent_fact_list",1000);
 	ros::Publisher areaPublisher=node_handle.advertise<situation_assessment_msgs::AreaList>("situation_assessment/area_polygons",1000);
@@ -327,6 +338,7 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_entities,areas);
+			vector<situation_assessment_msgs::Fact> at=agent_monitors.getAt(depth_areas,isInArea);
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
 			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities_plus_locations);
 			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities_plus_locations);
@@ -358,6 +370,9 @@ int main(int argc, char** argv) {
 			}
 			if (isInArea.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),isInArea.begin(),isInArea.end());
+			}
+			if (at.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),at.begin(),at.end());
 			}
 			if (entity_types.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),entity_types.begin(),entity_types.end());

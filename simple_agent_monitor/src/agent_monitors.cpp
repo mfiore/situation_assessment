@@ -113,7 +113,7 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getDeltaDistances(EntityM
 					situation_assessment_msgs::Fact f;
 					f.model=robot_name_;
 					f.subject=entity1->first;
-					f.predicate.push_back("delta_distance");
+					f.predicate.push_back("deltaDistance");
 					f.predicate.push_back(entity2->first);
 					f.value.push_back(boost::lexical_cast<string>(delta_distance));
 					result.push_back(f);
@@ -150,6 +150,36 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::getIsInArea(EntityMap map
 		return result;
 
 } 
+
+std::vector<situation_assessment_msgs::Fact> AgentMonitors::getAt(
+	std::map<std::string,int> depth_areas, std::vector<situation_assessment_msgs::Fact> is_in_area_facts) {
+	
+	std::vector<situation_assessment_msgs::Fact> result;
+
+	for (int i=0;i<is_in_area_facts.size();i++) {
+		string agent=is_in_area_facts[i].subject;
+		std::vector<std::string> areas=is_in_area_facts[i].value;
+
+		int max_depth=-1;
+		string location="";
+		for (string a:areas) {
+			if (depth_areas.at(a)>max_depth) {
+				max_depth=depth_areas.at(a);
+				location=a;
+			}
+		}
+		situation_assessment_msgs::Fact f;
+		f.model=robot_name_;
+		f.subject=agent;
+		f.predicate={"isAt"};
+		f.value={location};
+		result.push_back(f);
+	}
+	return result;
+
+}
+
+
 
 vector<situation_assessment_msgs::Fact> AgentMonitors::getEntityType(EntityMap map) {
 	vector<situation_assessment_msgs::Fact> result;
