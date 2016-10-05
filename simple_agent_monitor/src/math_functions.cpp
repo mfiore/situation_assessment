@@ -47,6 +47,10 @@ double isInAngle(geometry_msgs::Point p1,geometry_msgs::Point p2, double angleDi
     } else {
         return (angleThreshold - fabs(angleResult)) / angleThreshold;
     }
+    // double angle_result=atan2(p2.y-p1.y,p2.x-p1.y);
+    // ROS_INFO("angeldir %f angleresult %f diff %f",angleDir,angle_result,angleDir-angle_result);
+
+    // return fabs(angleDir-angle_result)<angleThreshold;
 }
 
 // Return angle between ent2 and ent1 and angleDir direction
@@ -54,7 +58,7 @@ double isInAngle(geometry_msgs::Point p1,geometry_msgs::Point p2, double angleDi
 double relativeAngle(geometry_msgs::Point p1,geometry_msgs::Point p2, double angleDir) {
     double actualAngleDir = acos((fabs(p1.x - p2.x)) / calculateDistance(p1,p2));
 
-    // Trigonometric adjustment
+    // // Trigonometric adjustment
     if (p1.x < p2.x)
         actualAngleDir = 3.1416 - actualAngleDir;
 
@@ -62,4 +66,7 @@ double relativeAngle(geometry_msgs::Point p1,geometry_msgs::Point p2, double ang
         actualAngleDir = -actualAngleDir;
 
     return angleDir - actualAngleDir;
+
+
 }
+

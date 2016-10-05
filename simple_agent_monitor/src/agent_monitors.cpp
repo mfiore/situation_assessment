@@ -14,8 +14,10 @@ vector<situation_assessment_msgs::Fact> AgentMonitors::calculateIsFacing(EntityM
 		for (EntityMap::iterator entity2=map2.begin(); entity2!=map2.end();entity2++) {
 			if (entity2->first!=entity1->first) {
 				pose2=entity2->second.pose.getSequence(1)[0];
-				bool value=isFacing(pose1,pose2.position);
-				facing_values.push_back(entity2->first);
+				bool value=(isFacing(pose1,pose2.position)>0.0);
+				if (value) {
+					facing_values.push_back(entity2->first);
+				}
 			}
 		}
 		if (facing_values.size()>0) {

@@ -15,6 +15,11 @@ situation_assessment:
         - waterbottle
         - teabottle
         - mug
+        - keys
+        - remote
+        - book1
+        - book2
+        - book3
         - table
         - shelf1
         - shelf2

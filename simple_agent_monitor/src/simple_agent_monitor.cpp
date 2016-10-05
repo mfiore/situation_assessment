@@ -336,6 +336,7 @@ int main(int argc, char** argv) {
 			//get facts
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
+			vector<situation_assessment_msgs::Fact> is_facing=agent_monitors.calculateIsFacing(all_agents,all_entities);
 			vector<situation_assessment_msgs::Fact> isMoving=agent_monitors.getIsMoving(all_agents);
 			vector<situation_assessment_msgs::Fact> isInArea=agent_monitors.getIsInArea(all_entities,areas);
 			vector<situation_assessment_msgs::Fact> at=agent_monitors.getAt(depth_areas,isInArea);
@@ -367,6 +368,9 @@ int main(int argc, char** argv) {
 			}
 			if (delta_distance.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),delta_distance.begin(),delta_distance.end());
+			}		
+			if (is_facing.size()>0) {
+				factList.fact_list.insert(factList.fact_list.end(),is_facing.begin(),is_facing.end());
 			}
 			if (isInArea.size()>0) {
 				factList.fact_list.insert(factList.fact_list.end(),isInArea.begin(),isInArea.end());
