@@ -1,45 +1,54 @@
 ---
 situation_assessment:
-    starting_world_state_file: /home/mfiore/ros_workspaces/indigo_ws/src/scenarios/demo_observer/world_state.xml
+    starting_world_state_file: /home/theworld/ros_workspaces/indigo_ws/src/scenarios/demo_observer/world_state.xml
     ring_buffer_length: 10
     use_orientation: false
+    track_robot: true
+    track_agents: true
+    track_objects: true
+    track_groups: false
     tf_bridge:
         track_robot: true
         track_agents: true
         track_objects: true
-        track_groups: true
+        track_groups: false
     human_names:
         - human1
-        # - HERAKLES_HUMAN2
+        # - human2
+    body_parts:
+        - head
+        - hand
+        - torso
+        # - human2 
     object_names:
         - waterbottle
         - teabottle
         - mug
         - keys
-        - remote
+        # - remote
         - book1
         - book2
-        - book3
+        # - book3
         - table
         - shelf1
         - shelf2
-        - shelf3
-        - sidetable
+        # - shelf3
+        # - sidetable
         - sofa
-        - livingroom
-        - bathroom
+        # - livingroom
+        # - bathroom
         - outside
     locations:
-        - livingroom
+        # - livingroom
         - outside
         - table
         - shelf1
         - shelf2
-        - shelf3
+        # - shelf3
         - sofa
-        - sidetable
+        # - sidetable
         - this
-        - bathroom
+        # - bathroom
     locations_depth:
         livingroom: 1
         outside: 1

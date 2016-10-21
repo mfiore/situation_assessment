@@ -94,6 +94,8 @@ void addAreaHelper(string name, geometry_msgs::Polygon area) {
 bool addArea(situation_assessment_msgs::AddArea::Request &req, situation_assessment_msgs::AddArea::Response &res) {
 	using namespace boost::polygon::operators;
 
+	ROS_INFO("SIMPLE_AGENT_MONITOR received request to add area");
+
 	if (req.linked_to_entity!="") { //if linked will update the area with the entity position
 		entity_areas[req.linked_to_entity]=req.area;
 		ROS_INFO("SIMPLE_AGENT_MONITOR Adding a new area to entity %s",req.linked_to_entity.c_str());
@@ -344,6 +346,7 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities_plus_locations);
 			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities_plus_locations);
 
+			
 			vector<string> area_names;
 			for (PolygonMap::iterator it=areas.begin();it!=areas.end();it++) {
 				area_names.push_back(it->first);

@@ -24,27 +24,42 @@ void TfBridge::getPoses() {
 
 	if (track_agents_) {
 		BOOST_FOREACH(string agent_name,agent_list_) {
+			
 			try {
-				tf::StampedTransform transform;
-				listener_.waitForTransform("map", agent_name, ros::Time(0), ros::Duration(1.0) );
-				if (!ros::ok()) {
-					return;
+
+				BOOST_FOREACH(string part,body_parts_) {
+
+					string tf_name=agent_name+"_"+part;
+					tf::StampedTransform transform;
+					// ROS_INFO("TF_BRIDGE in track_agents_");
+
+					listener_.waitForTransform("map", tf_name, ros::Time(0), ros::Duration(1.0) );
+					if (!ros::ok()) {
+						return;
+					}
+					// ROS_INFO("TF_BRIDGE in track_agents_");
+
+					listener_.lookupTransform("map",tf_name,ros::Time(0),transform);
+
+					// ROS_INFO("TF_BRIDGE in track_agents_");
+
+					geometry_msgs::Pose pose=tfToGeometry(transform);
+					agent_poses_[tf_name].pose=pose;
+					agent_poses_[tf_name].name=agent_name;
+					agent_poses_[tf_name].type="human";
+					new_group_pose.position.x=new_group_pose.position.x+transform.getOrigin().getX();
+					new_group_pose.position.y=new_group_pose.position.y+transform.getOrigin().getY();
+					new_group_pose.position.z=new_group_pose.position.z+transform.getOrigin().getZ();
+					// ROS_INFO("TF_BRIDGE in track_agents_");
+
 				}
-				listener_.lookupTransform("map",agent_name,ros::Time(0),transform);
-
-				geometry_msgs::Pose pose=tfToGeometry(transform);
-				agent_poses_[agent_name].pose=pose;
-				agent_poses_[agent_name].name=agent_name;
-				agent_poses_[agent_name].type="human";
-				new_group_pose.position.x=new_group_pose.position.x+transform.getOrigin().getX();
-				new_group_pose.position.y=new_group_pose.position.y+transform.getOrigin().getY();
-				new_group_pose.position.z=new_group_pose.position.z+transform.getOrigin().getZ();
-
-			}     catch (tf::TransformException ex){
+			}   catch (tf::TransformException ex){
 				// ROS_ERROR("%s",ex.what());
 			}
+			
 		}
 	}
+
 	if (track_agents_ && track_groups_) {
 		new_group_pose.position.x=new_group_pose.position.x/agent_list_.size();
 		new_group_pose.position.y=new_group_pose.position.y/agent_list_.size();
@@ -74,6 +89,10 @@ void TfBridge::getPoses() {
 				listener_.lookupTransform("map",object_list_[i],ros::Time(0),transform);
 
 				geometry_msgs::Pose pose=tfToGeometry(transform);
+				// ROS_INFO("TF_BRIDGE quaternion for %s %f %f %f %f",object_list_[i].c_str(),
+					// pose.orientation.x,pose.orientation.y,pose.orientation.z,pose.orientation.w);
+				
+				pose.orientation.w=1;
 				object_poses_[object_list_[i]].pose=pose;
 				object_poses_[object_list_[i]].name=object_list_[i];
 			}     catch (tf::TransformException ex){

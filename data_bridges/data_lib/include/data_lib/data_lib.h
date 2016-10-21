@@ -74,6 +74,7 @@ protected:
 	StringVectorMap agent_groups_;
 	ros::Publisher robot_pub_,agents_pub_,objects_pub_,groups_pub_;
 
+	std::vector<std::string> body_parts_;
 
 
 	ros::NodeHandle node_handle_;

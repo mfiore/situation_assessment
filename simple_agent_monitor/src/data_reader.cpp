@@ -2,8 +2,20 @@
 
 DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	node_handle.getParam("situation_assessment/ring_buffer_length",ring_buffer_length_);
+	bool track_robot;
+	bool track_agents;
+	bool track_objects;
+	bool track_groups;
+	node_handle.getParam("situation_assessment/track_robot",track_robot);
+	node_handle.getParam("situation_assessment/track_agents",track_agents);
+	node_handle.getParam("situation_assessment/track_objects",track_objects);
+	node_handle.getParam("situation_assessment/track_groups",track_groups);
+
+	ROS_INFO("DATA_READER tracking: robot %d agents %d objects %d groups %d",track_robot,
+		track_agents,track_objects,track_groups);
 
 	ROS_INFO("DATA_READER   Ring buffer length is %d",ring_buffer_length_);
+
 	robot_sub_=node_handle_.subscribe("situation_assessment/robot_pose",1000,
 		&DataReader::robotCallback,this);
 	agents_sub_=node_handle_.subscribe("situation_assessment/agent_poses",1000,
@@ -21,10 +33,11 @@ DataReader::DataReader(ros::NodeHandle node_handle):node_handle_(node_handle) {
 	ROS_INFO("DATA_READER Waiting for appropriate topics to be published");
 	
 	ros::Rate r(3);
-	while ((robot_sub_.getNumPublishers()==0   
-		    || agents_sub_.getNumPublishers()==0
-		    || objects_sub_.getNumPublishers()==0
-		    || groups_sub_.getNumPublishers()==0)  && ros::ok()) {
+	while ( (
+		(robot_sub_.getNumPublishers()==0 && track_robot)  
+		    || (agents_sub_.getNumPublishers()==0 && track_agents)
+		    || (objects_sub_.getNumPublishers()==0 && track_objects)
+		    || (groups_sub_.getNumPublishers()==0 && track_groups))  && ros::ok()) {
 		r.sleep();
 	}	
 	ROS_INFO("DATA_READER Done and ready");

@@ -10,6 +10,7 @@ node_handle_(node_handle) {
 	node_handle_.getParam(param_prefix+"track_groups",track_groups_);	
 	node_handle_.getParam("/robot/name",robot_name_);
 	node_handle_.getParam("/situation_assessment/human_names",agent_list_);
+	node_handle_.getParam("/situation_assessment/body_parts",body_parts_);
 	node_handle_.getParam("/situation_assessment/object_names",object_list_);
 
 	ROS_INFO("DATA_LIB   Parameters are:");
@@ -21,6 +22,10 @@ node_handle_(node_handle) {
 	ROS_INFO("DATA_LIB   Known agents");
 	BOOST_FOREACH(string agent, agent_list_) {
 		ROS_INFO("DATA_LIB   - %s",agent.c_str());
+	}		
+	ROS_INFO("DATA_LIB   Known body parts");
+	BOOST_FOREACH(string part, body_parts_) {
+		ROS_INFO("DATA_LIB   - %s",part.c_str());
 	}	
 	ROS_INFO("DATA_LIB   Known Objects");
 	BOOST_FOREACH(string object, object_list_) {
@@ -53,7 +58,6 @@ void DataLib::publishData() {
 		robot_pub_.publish(msg);
 	}
 	if (track_agents_){
-
 		situation_assessment_msgs::NamedPoseList list_msg=getNamedPoseListMsg(agent_poses_);
 		agents_pub_.publish(list_msg);
 	}
