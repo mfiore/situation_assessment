@@ -266,6 +266,7 @@ int main(int argc, char** argv) {
 		depth_areas[l]=depth;
 		ROS_INFO("SIMPLE_AGENT_MONITOR - location %s depth %d",l.c_str(),depth);
 	}
+	depth_areas["this"]=0;
 
 
 	ros::Publisher factPublisher=node_handle.advertise<situation_assessment_msgs::FactList>("situation_assessment/agent_fact_list",1000);
@@ -336,6 +337,7 @@ int main(int argc, char** argv) {
 			}
 			updateEntityAreas(all_agents); //update areas linked to entities
 			//get facts
+
 			vector<situation_assessment_msgs::Fact> distances=agent_monitors.getDistances(all_agents,all_entities,&entity_distances);
 			vector<situation_assessment_msgs::Fact> delta_distance=agent_monitors.getDeltaDistances(all_agents,all_entities,entity_distances);
 			vector<situation_assessment_msgs::Fact> is_facing=agent_monitors.calculateIsFacing(all_agents,all_entities);
@@ -345,7 +347,6 @@ int main(int argc, char** argv) {
 			vector<situation_assessment_msgs::Fact> group_contains=agent_monitors.getGroupContains(group_members);	
 			vector<situation_assessment_msgs::Fact> entity_types=agent_monitors.getEntityType(all_entities_plus_locations);
 			vector<situation_assessment_msgs::Fact> entity_poses=agent_monitors.getEntityPoses(all_entities_plus_locations);
-
 			
 			vector<string> area_names;
 			for (PolygonMap::iterator it=areas.begin();it!=areas.end();it++) {
